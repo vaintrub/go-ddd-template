@@ -3,8 +3,8 @@ package training
 import (
 	"fmt"
 
-	commonErrors "github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/errors"
 	"github.com/pkg/errors"
+	commonErrors "github.com/vaintrub/go-ddd-template/internal/common/errors"
 )
 
 // UserType is enum-like type.

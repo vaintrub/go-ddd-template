@@ -4,15 +4,15 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/auth"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/server/httperr"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/app"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/app/command"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/app/query"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/domain/training"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 	openapi_types "github.com/oapi-codegen/runtime/types"
+	"github.com/vaintrub/go-ddd-template/internal/common/auth"
+	"github.com/vaintrub/go-ddd-template/internal/common/server/httperr"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/app"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/app/command"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/app/query"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
 type HttpServer struct {

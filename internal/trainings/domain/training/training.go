@@ -3,8 +3,8 @@ package training
 import (
 	"time"
 
-	commonerrors "github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/errors"
 	"github.com/pkg/errors"
+	commonerrors "github.com/vaintrub/go-ddd-template/internal/common/errors"
 )
 
 type Training struct {

@@ -7,12 +7,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/genproto/trainer"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/logs"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/server"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/ports"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/service"
 	"github.com/go-chi/chi/v5"
+	"github.com/vaintrub/go-ddd-template/internal/common/genproto/trainer"
+	"github.com/vaintrub/go-ddd-template/internal/common/logs"
+	"github.com/vaintrub/go-ddd-template/internal/common/server"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/ports"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/service"
 	"google.golang.org/grpc"
 )
 

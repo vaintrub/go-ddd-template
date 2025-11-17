@@ -3,23 +3,22 @@ package adapters_test
 import (
 	"context"
 	"errors"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/adapters"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/adapters"
 
 	"cloud.google.com/go/firestore"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/domain/hour"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/domain/hour"
 )
 
 func TestRepository(t *testing.T) {
 	t.Parallel()
-	rand.Seed(time.Now().UTC().UnixNano())
 
 	repositories := createRepositories(t)
 
@@ -331,7 +330,8 @@ func newValidHourTime() time.Time {
 		minTimestamp := minTime.Unix()
 		maxTimestamp := minTime.AddDate(0, 0, testHourFactory.Config().MaxWeeksInTheFutureToSet*7).Unix()
 
-		t := time.Unix(rand.Int63n(maxTimestamp-minTimestamp)+minTimestamp, 0).Truncate(time.Hour).Local()
+		// #nosec G404 - math/rand is sufficient for test data generation
+		t := time.Unix(rand.Int64N(maxTimestamp-minTimestamp)+minTimestamp, 0).Truncate(time.Hour).Local()
 
 		_, alreadyUsed := usedHours.LoadOrStore(t.Unix(), true)
 		if !alreadyUsed {

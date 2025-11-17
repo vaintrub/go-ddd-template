@@ -3,9 +3,9 @@ package training_test
 import (
 	"testing"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/domain/training"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
 func TestTraining_Cancel(t *testing.T) {

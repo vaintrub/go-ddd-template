@@ -5,7 +5,6 @@ go 1.25.4
 require (
 	cloud.google.com/go/firestore v1.20.0
 	firebase.google.com/go/v4 v4.18.0
-	github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common v0.0.0-20251103104941-f264c714c5d6
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-chi/render v1.0.3
 	github.com/golang/protobuf v1.5.4
@@ -81,3 +80,5 @@ require (
 	gopkg.in/fsnotify.v1 v1.4.7 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
+
+replace github.com/vaintrub/go-ddd-template/internal/common => ../common

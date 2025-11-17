@@ -22,6 +22,18 @@ skinparam rectangle<<_GROUP>> {
   BorderColor #ffffff
 }
 
+skinparam database<<DB>> {
+  BackgroundColor #c8c8c8
+  FontColor #000000
+  BorderColor #000000
+}
+
+skinparam rectangle<<ROOT>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #000000
+}
+
 skinparam rectangle<<APP>> {
   BackgroundColor #1a4577
   FontColor #ffffff
@@ -40,88 +52,135 @@ skinparam rectangle<<DOMAIN>> {
   BorderColor #000000
 }
 
-skinparam database<<DB>> {
-  BackgroundColor #c8c8c8
-  FontColor #000000
-  BorderColor #000000
-}
-
-skinparam rectangle<<ROOT>> {
-  BackgroundColor #ffffff
-  FontColor #000000
-  BorderColor #000000
-}
-
 rectangle 0ROOT <<_GROUP>> {
-	rectangle "==app.Application\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 1595196051
+	rectangle "==app.Queries\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 3867353216
 }
 rectangle 0ROOT <<_GROUP>> {
-	rectangle "==app.Queries\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 2827497597
+	rectangle "==app.Commands\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 3022602174
 }
 rectangle 0ROOT <<_GROUP>> {
-	rectangle "==app.Commands\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 2042358025
+	rectangle "==app.Application\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 2045385342
 }
-1595196051 .[#000000].> 2042358025 : ""
-1595196051 .[#000000].> 2827497597 : ""
-rectangle 28274975971APP <<_GROUP>> {
-	rectangle "==query.AllTrainingsHandler\n<size:10>[component]</size>\n\napplication query" <<APP>> as 3287812968
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.rejectTrainingRescheduleHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 2000844625
 }
-2827497597 .[#000000].> 3287812968 : ""
-rectangle 28274975971APP <<_GROUP>> {
-	rectangle "==query.TrainingsForUserHandler\n<size:10>[component]</size>\n\napplication query" <<APP>> as 1094798405
+3022602174 .[#000000].> 2000844625 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.RescheduleTraining\n<size:10>[component]</size>\n\napplication command" <<APP>> as 1148194748
 }
-2827497597 .[#000000].> 1094798405 : ""
-rectangle 20423580251APP <<_GROUP>> {
-	rectangle "==command.ApproveTrainingRescheduleHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 3887158788
+3022602174 .[#000000].> 1148194748 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.RequestTrainingReschedule\n<size:10>[component]</size>\n\napplication command" <<APP>> as 669222001
 }
-2042358025 .[#000000].> 3887158788 : ""
-rectangle 20423580251APP <<_GROUP>> {
-	rectangle "==command.CancelTrainingHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 224341371
+3022602174 .[#000000].> 669222001 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.ScheduleTraining\n<size:10>[component]</size>\n\napplication command" <<APP>> as 2888741745
 }
-2042358025 .[#000000].> 224341371 : ""
-rectangle 20423580251APP <<_GROUP>> {
-	rectangle "==command.RejectTrainingRescheduleHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 2302791080
+3022602174 .[#000000].> 2888741745 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.RejectTrainingReschedule\n<size:10>[component]</size>\n\napplication command" <<APP>> as 2563655383
 }
-2042358025 .[#000000].> 2302791080 : ""
-rectangle 20423580251APP <<_GROUP>> {
-	rectangle "==command.RescheduleTrainingHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 3456104041
+3022602174 .[#000000].> 2563655383 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.rescheduleTrainingHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 3783054912
 }
-2042358025 .[#000000].> 3456104041 : ""
-rectangle 20423580251APP <<_GROUP>> {
-	rectangle "==command.RequestTrainingRescheduleHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 4186077052
+3022602174 .[#000000].> 3783054912 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.requestTrainingRescheduleHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 2111401239
 }
-2042358025 .[#000000].> 4186077052 : ""
-rectangle 20423580251APP <<_GROUP>> {
-	rectangle "==command.ScheduleTrainingHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 142372322
+3022602174 .[#000000].> 2111401239 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.scheduleTrainingHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 3565431895
 }
-2042358025 .[#000000].> 142372322 : ""
-rectangle 34561040412ADAPTER <<_GROUP>> {
-	rectangle "==adapters.TrainingsFirestoreRepository\n<size:10>[component]</size>\n\nadapter component" <<ADAPTER>> as 1383687574
+3022602174 .[#000000].> 3565431895 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.approveTrainingRescheduleHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 4179129211
 }
-3456104041 .[#000000].> 1383687574 : ""
-rectangle 34561040412ADAPTER <<_GROUP>> {
-	rectangle "==adapters.UsersGrpc\n<size:10>[component]</size>\n\nadapter component" <<ADAPTER>> as 881049450
+3022602174 .[#000000].> 4179129211 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.ApproveTrainingReschedule\n<size:10>[component]</size>\n\napplication command" <<APP>> as 645249069
 }
-3456104041 .[#000000].> 881049450 : ""
-rectangle 34561040412ADAPTER <<_GROUP>> {
-	rectangle "==adapters.TrainerGrpc\n<size:10>[component]</size>\n\nadapter component" <<ADAPTER>> as 2401551451
+3022602174 .[#000000].> 645249069 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.cancelTrainingHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 2658204614
 }
-3456104041 .[#000000].> 2401551451 : ""
-4186077052 .[#000000].> 1383687574 : ""
-3287812968 .[#000000].> 1383687574 : ""
-224341371 .[#000000].> 881049450 : ""
-224341371 .[#000000].> 2401551451 : ""
-224341371 .[#000000].> 1383687574 : ""
-2302791080 .[#000000].> 1383687574 : ""
-3887158788 .[#000000].> 1383687574 : ""
-3887158788 .[#000000].> 881049450 : ""
-3887158788 .[#000000].> 2401551451 : ""
-142372322 .[#000000].> 1383687574 : ""
-142372322 .[#000000].> 881049450 : ""
-142372322 .[#000000].> 2401551451 : ""
-1094798405 .[#000000].> 1383687574 : ""
-rectangle 13836875743DB <<_GROUP>> {
+3022602174 .[#000000].> 2658204614 : ""
+rectangle 30226021741APP <<_GROUP>> {
+	rectangle "==command.CancelTraining\n<size:10>[component]</size>\n\napplication command" <<APP>> as 1787795126
+}
+3022602174 .[#000000].> 1787795126 : ""
+2045385342 .[#000000].> 3022602174 : ""
+2045385342 .[#000000].> 3867353216 : ""
+rectangle 38673532161APP <<_GROUP>> {
+	rectangle "==query.allTrainingsHandler\n<size:10>[component]</size>\n\napplication query" <<APP>> as 1466187853
+}
+3867353216 .[#000000].> 1466187853 : ""
+rectangle 38673532161APP <<_GROUP>> {
+	rectangle "==query.AllTrainings\n<size:10>[component]</size>\n\napplication query" <<APP>> as 4066443323
+}
+3867353216 .[#000000].> 4066443323 : ""
+rectangle 38673532161APP <<_GROUP>> {
+	rectangle "==query.trainingsForUserHandler\n<size:10>[component]</size>\n\napplication query" <<APP>> as 1727211668
+}
+3867353216 .[#000000].> 1727211668 : ""
+rectangle 38673532161APP <<_GROUP>> {
+	rectangle "==query.TrainingsForUser\n<size:10>[component]</size>\n\napplication query" <<APP>> as 2295567224
+}
+3867353216 .[#000000].> 2295567224 : ""
+rectangle 25636553832DOMAIN <<_GROUP>> {
+	rectangle "==training.User\n<size:10>[component]</size>\n\ndomain component" <<DOMAIN>> as 3353742755
+}
+2563655383 .[#000000].> 3353742755 : ""
+rectangle 26582046142ADAPTER <<_GROUP>> {
+	rectangle "==adapters.UsersGrpc\n<size:10>[component]</size>\n\nadapter component" <<ADAPTER>> as 1069688437
+}
+2658204614 .[#000000].> 1069688437 : ""
+rectangle 26582046142ADAPTER <<_GROUP>> {
+	rectangle "==adapters.TrainerGrpc\n<size:10>[component]</size>\n\nadapter component" <<ADAPTER>> as 3521198480
+}
+2658204614 .[#000000].> 3521198480 : ""
+2658204614 .[#000000].> 1787795126 : ""
+rectangle 26582046142ADAPTER <<_GROUP>> {
+	rectangle "==adapters.TrainingsFirestoreRepository\n<size:10>[component]</size>\n\nadapter component" <<ADAPTER>> as 2139355671
+}
+2658204614 .[#000000].> 2139355671 : ""
+1787795126 .[#000000].> 3353742755 : ""
+2111401239 .[#000000].> 2139355671 : ""
+2111401239 .[#000000].> 669222001 : ""
+1148194748 .[#000000].> 3353742755 : ""
+669222001 .[#000000].> 3353742755 : ""
+645249069 .[#000000].> 3353742755 : ""
+3783054912 .[#000000].> 2139355671 : ""
+3783054912 .[#000000].> 1069688437 : ""
+3783054912 .[#000000].> 3521198480 : ""
+3783054912 .[#000000].> 1148194748 : ""
+1727211668 .[#000000].> 2139355671 : ""
+1727211668 .[#000000].> 2295567224 : ""
+2000844625 .[#000000].> 2139355671 : ""
+2000844625 .[#000000].> 2563655383 : ""
+3565431895 .[#000000].> 2139355671 : ""
+3565431895 .[#000000].> 1069688437 : ""
+3565431895 .[#000000].> 3521198480 : ""
+3565431895 .[#000000].> 2888741745 : ""
+1466187853 .[#000000].> 2139355671 : ""
+1466187853 .[#000000].> 4066443323 : ""
+4179129211 .[#000000].> 2139355671 : ""
+4179129211 .[#000000].> 1069688437 : ""
+4179129211 .[#000000].> 3521198480 : ""
+4179129211 .[#000000].> 645249069 : ""
+rectangle 33537427553DOMAIN <<_GROUP>> {
+	rectangle "==training.UserType\n<size:10>[component]</size>\n\ndomain component" <<DOMAIN>> as 3826262459
+}
+3353742755 .[#000000].> 3826262459 : ""
+rectangle 21393556713DB <<_GROUP>> {
 	database "==Firestore\n<size:10>[component]</size>\n\nfirestore client" <<DB>> as 650530190
 }
-1383687574 .[#000000].> 650530190 : ""
+2139355671 .[#000000].> 650530190 : ""
+rectangle 21393556713DOMAIN <<_GROUP>> {
+	rectangle "==training.Training\n<size:10>[component]</size>\n\ndomain component" <<DOMAIN>> as 251684942
+}
+2139355671 .[#000000].> 251684942 : ""
+2139355671 .[#000000].> 3353742755 : ""
+650530190 .[#000000].> 650530190 : ""
+251684942 .[#000000].> 3826262459 : ""
 @enduml

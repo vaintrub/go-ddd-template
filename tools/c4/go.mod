@@ -3,8 +3,9 @@ module github.com/vaintrub/go-ddd-template/tools/c4
 go 1.25.4
 
 require (
-	github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer v0.0.0-20251103104941-f264c714c5d6
-	github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings v0.0.0-20251103104941-f264c714c5d6
+	github.com/krzysztofreczek/go-structurizr v0.1.55
+	github.com/vaintrub/go-ddd-template/internal/trainer v0.0.0
+	github.com/vaintrub/go-ddd-template/internal/trainings v0.0.0
 )
 
 require (
@@ -16,13 +17,11 @@ require (
 	cloud.google.com/go/longrunning v0.6.7 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	firebase.google.com/go/v4 v4.18.0 // indirect
-	github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common v0.0.0-20251103104941-f264c714c5d6 // indirect
 	github.com/ajg/form v1.5.1 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/cnf/structhash v0.0.0-20250313080605-df4c6cc74a9a // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-chi/chi/v5 v5.2.3 // indirect
-	github.com/go-chi/cors v1.2.2 // indirect
 	github.com/go-chi/render v1.0.3 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -31,15 +30,14 @@ require (
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.7 // indirect
 	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/jmoiron/sqlx v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
+	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/stretchr/testify v1.11.1 // indirect
+	github.com/vaintrub/go-ddd-template/internal/common v0.0.0-00010101000000-000000000000 // indirect
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.61.0 // indirect
@@ -48,6 +46,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.37.0 // indirect
 	go.opentelemetry.io/otel/trace v1.37.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/oauth2 v0.33.0 // indirect
@@ -56,7 +55,6 @@ require (
 	golang.org/x/term v0.36.0 // indirect
 	golang.org/x/text v0.30.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
-	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/api v0.256.0 // indirect
 	google.golang.org/appengine/v2 v2.0.6 // indirect
 	google.golang.org/genproto v0.0.0-20250603155806-513f23925822 // indirect
@@ -64,4 +62,11 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251103181224-f26f9409b101 // indirect
 	google.golang.org/grpc v1.76.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+replace (
+	github.com/vaintrub/go-ddd-template/internal/common => ../../internal/common
+	github.com/vaintrub/go-ddd-template/internal/trainer => ../../internal/trainer
+	github.com/vaintrub/go-ddd-template/internal/trainings => ../../internal/trainings
 )

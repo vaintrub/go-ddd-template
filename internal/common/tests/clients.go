@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/client/trainer"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/client/trainings"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/client/users"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"github.com/vaintrub/go-ddd-template/internal/common/client/trainer"
+	"github.com/vaintrub/go-ddd-template/internal/common/client/trainings"
+	"github.com/vaintrub/go-ddd-template/internal/common/client/users"
 )
 
 func authorizationBearer(token string) func(context.Context, *http.Request) error {

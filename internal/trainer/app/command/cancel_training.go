@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/decorator"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/errors"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/domain/hour"
 	"github.com/sirupsen/logrus"
+	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
+	"github.com/vaintrub/go-ddd-template/internal/common/errors"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/domain/hour"
 )
 
 type CancelTraining struct {

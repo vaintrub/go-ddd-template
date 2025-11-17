@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"cloud.google.com/go/firestore"
-	grpcClient "github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/client"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/metrics"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/adapters"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/app"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/app/command"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/app/query"
 	"github.com/sirupsen/logrus"
+	grpcClient "github.com/vaintrub/go-ddd-template/internal/common/client"
+	"github.com/vaintrub/go-ddd-template/internal/common/metrics"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/adapters"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/app"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/app/command"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/app/query"
 )
 
 func NewApplication(ctx context.Context) (app.Application, func()) {

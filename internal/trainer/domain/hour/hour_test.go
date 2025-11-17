@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/domain/hour"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/domain/hour"
 )
 
 var testHourFactory = hour.MustNewFactory(hour.FactoryConfig{

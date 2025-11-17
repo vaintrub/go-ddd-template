@@ -22,12 +22,6 @@ skinparam rectangle<<_GROUP>> {
   BorderColor #ffffff
 }
 
-skinparam rectangle<<DOMAIN>> {
-  BackgroundColor #ffffff
-  FontColor #000000
-  BorderColor #000000
-}
-
 skinparam database<<DB>> {
   BackgroundColor #c8c8c8
   FontColor #000000
@@ -52,65 +46,112 @@ skinparam rectangle<<ADAPTER>> {
   BorderColor #000000
 }
 
+skinparam rectangle<<DOMAIN>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #000000
+}
+
 rectangle 0ROOT <<_GROUP>> {
-	rectangle "==app.Application\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 2102746645
+	rectangle "==app.Commands\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 3107421184
 }
 rectangle 0ROOT <<_GROUP>> {
-	rectangle "==app.Commands\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 1118686339
+	rectangle "==app.Queries\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 2313245734
 }
 rectangle 0ROOT <<_GROUP>> {
-	rectangle "==app.Queries\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 441257907
+	rectangle "==app.Application\n<size:10>[component]</size>\n\napplication context" <<ROOT>> as 3008513984
 }
-2102746645 .[#000000].> 1118686339 : ""
-2102746645 .[#000000].> 441257907 : ""
-rectangle 11186863391APP <<_GROUP>> {
-	rectangle "==command.CancelTrainingHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 1938493317
+rectangle 23132457341APP <<_GROUP>> {
+	rectangle "==query.AvailableHours\n<size:10>[component]</size>\n\napplication query" <<APP>> as 165595061
 }
-1118686339 .[#000000].> 1938493317 : ""
-rectangle 11186863391APP <<_GROUP>> {
-	rectangle "==command.ScheduleTrainingHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 644318352
+2313245734 .[#000000].> 165595061 : ""
+rectangle 23132457341APP <<_GROUP>> {
+	rectangle "==query.hourAvailabilityHandler\n<size:10>[component]</size>\n\napplication query" <<APP>> as 1894426490
 }
-1118686339 .[#000000].> 644318352 : ""
-rectangle 11186863391APP <<_GROUP>> {
-	rectangle "==command.MakeHoursAvailableHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 2676216945
+2313245734 .[#000000].> 1894426490 : ""
+rectangle 23132457341APP <<_GROUP>> {
+	rectangle "==query.HourAvailability\n<size:10>[component]</size>\n\napplication query" <<APP>> as 1622562898
 }
-1118686339 .[#000000].> 2676216945 : ""
-rectangle 11186863391APP <<_GROUP>> {
-	rectangle "==command.MakeHoursUnavailableHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 3319250726
+2313245734 .[#000000].> 1622562898 : ""
+rectangle 23132457341APP <<_GROUP>> {
+	rectangle "==query.availableHoursHandler\n<size:10>[component]</size>\n\napplication query" <<APP>> as 1361812259
 }
-1118686339 .[#000000].> 3319250726 : ""
-rectangle 4412579071APP <<_GROUP>> {
-	rectangle "==query.HourAvailabilityHandler\n<size:10>[component]</size>\n\napplication query" <<APP>> as 2484812079
+2313245734 .[#000000].> 1361812259 : ""
+3008513984 .[#000000].> 3107421184 : ""
+3008513984 .[#000000].> 2313245734 : ""
+rectangle 31074211841APP <<_GROUP>> {
+	rectangle "==command.cancelTrainingHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 2653510160
 }
-441257907 .[#000000].> 2484812079 : ""
-rectangle 4412579071APP <<_GROUP>> {
-	rectangle "==query.AvailableHoursHandler\n<size:10>[component]</size>\n\napplication query" <<APP>> as 1971034922
+3107421184 .[#000000].> 2653510160 : ""
+rectangle 31074211841APP <<_GROUP>> {
+	rectangle "==command.MakeHoursAvailable\n<size:10>[component]</size>\n\napplication command" <<APP>> as 1449791584
 }
-441257907 .[#000000].> 1971034922 : ""
-rectangle 6443183522ADAPTER <<_GROUP>> {
-	rectangle "==adapters.FirestoreHourRepository\n<size:10>[component]</size>\n\nadapter component" <<ADAPTER>> as 3637611987
+3107421184 .[#000000].> 1449791584 : ""
+rectangle 31074211841APP <<_GROUP>> {
+	rectangle "==command.makeHoursUnavailableHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 3788932615
 }
-644318352 .[#000000].> 3637611987 : ""
-2676216945 .[#000000].> 3637611987 : ""
-3319250726 .[#000000].> 3637611987 : ""
-2484812079 .[#000000].> 3637611987 : ""
-rectangle 19710349222ADAPTER <<_GROUP>> {
-	rectangle "==adapters.DatesFirestoreRepository\n<size:10>[component]</size>\n\nadapter component" <<ADAPTER>> as 2388943490
+3107421184 .[#000000].> 3788932615 : ""
+rectangle 31074211841APP <<_GROUP>> {
+	rectangle "==command.MakeHoursUnavailable\n<size:10>[component]</size>\n\napplication command" <<APP>> as 1545698977
 }
-1971034922 .[#000000].> 2388943490 : ""
-1938493317 .[#000000].> 3637611987 : ""
-rectangle 36376119873DB <<_GROUP>> {
+3107421184 .[#000000].> 1545698977 : ""
+rectangle 31074211841APP <<_GROUP>> {
+	rectangle "==command.CancelTraining\n<size:10>[component]</size>\n\napplication command" <<APP>> as 31117132
+}
+3107421184 .[#000000].> 31117132 : ""
+rectangle 31074211841APP <<_GROUP>> {
+	rectangle "==command.scheduleTrainingHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 3804393005
+}
+3107421184 .[#000000].> 3804393005 : ""
+rectangle 31074211841APP <<_GROUP>> {
+	rectangle "==command.ScheduleTraining\n<size:10>[component]</size>\n\napplication command" <<APP>> as 2827090651
+}
+3107421184 .[#000000].> 2827090651 : ""
+rectangle 31074211841APP <<_GROUP>> {
+	rectangle "==command.makeHoursAvailableHandler\n<size:10>[component]</size>\n\napplication command" <<APP>> as 1378835836
+}
+3107421184 .[#000000].> 1378835836 : ""
+rectangle 38043930052ADAPTER <<_GROUP>> {
+	rectangle "==adapters.FirestoreHourRepository\n<size:10>[component]</size>\n\nadapter component" <<ADAPTER>> as 2562497532
+}
+3804393005 .[#000000].> 2562497532 : ""
+3804393005 .[#000000].> 2827090651 : ""
+rectangle 13618122592ADAPTER <<_GROUP>> {
+	rectangle "==adapters.DatesFirestoreRepository\n<size:10>[component]</size>\n\nadapter component" <<ADAPTER>> as 3068465151
+}
+1361812259 .[#000000].> 3068465151 : ""
+1361812259 .[#000000].> 165595061 : ""
+1894426490 .[#000000].> 2562497532 : ""
+1894426490 .[#000000].> 1622562898 : ""
+2653510160 .[#000000].> 2562497532 : ""
+2653510160 .[#000000].> 31117132 : ""
+3788932615 .[#000000].> 2562497532 : ""
+3788932615 .[#000000].> 1545698977 : ""
+1378835836 .[#000000].> 2562497532 : ""
+1378835836 .[#000000].> 1449791584 : ""
+rectangle 25624975323DB <<_GROUP>> {
 	database "==Firestore\n<size:10>[component]</size>\n\nfirestore client" <<DB>> as 650530190
 }
-3637611987 .[#000000].> 650530190 : ""
-rectangle 36376119873DOMAIN <<_GROUP>> {
-	rectangle "==hour.Factory\n<size:10>[component]</size>\n\ndomain component" <<DOMAIN>> as 2036754401
+2562497532 .[#000000].> 650530190 : ""
+rectangle 25624975323DOMAIN <<_GROUP>> {
+	rectangle "==hour.Factory\n<size:10>[component]</size>\n\ndomain component" <<DOMAIN>> as 1635783480
 }
-3637611987 .[#000000].> 2036754401 : ""
-2388943490 .[#000000].> 650530190 : ""
-rectangle 23889434903DOMAIN <<_GROUP>> {
-	rectangle "==hour.FactoryConfig\n<size:10>[component]</size>\n\ndomain component" <<DOMAIN>> as 415674051
+2562497532 .[#000000].> 1635783480 : ""
+rectangle 25624975323DOMAIN <<_GROUP>> {
+	rectangle "==hour.Hour\n<size:10>[component]</size>\n\ndomain component" <<DOMAIN>> as 60122308
 }
-2388943490 .[#000000].> 415674051 : ""
-2036754401 .[#000000].> 415674051 : ""
+2562497532 .[#000000].> 60122308 : ""
+3068465151 .[#000000].> 650530190 : ""
+rectangle 30684651513DOMAIN <<_GROUP>> {
+	rectangle "==hour.FactoryConfig\n<size:10>[component]</size>\n\ndomain component" <<DOMAIN>> as 2853556374
+}
+3068465151 .[#000000].> 2853556374 : ""
+1635783480 .[#000000].> 2853556374 : ""
+1635783480 .[#000000].> 60122308 : ""
+rectangle 16357834804DOMAIN <<_GROUP>> {
+	rectangle "==hour.Availability\n<size:10>[component]</size>\n\ndomain component" <<DOMAIN>> as 995934329
+}
+1635783480 .[#000000].> 995934329 : ""
+650530190 .[#000000].> 650530190 : ""
+60122308 .[#000000].> 995934329 : ""
 @enduml

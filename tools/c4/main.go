@@ -8,8 +8,8 @@ import (
 	"github.com/krzysztofreczek/go-structurizr/pkg/scraper"
 	"github.com/krzysztofreczek/go-structurizr/pkg/view"
 
-	trainerService "github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/service"
-	trainingsService "github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/service"
+	trainerService "github.com/vaintrub/go-ddd-template/internal/trainer/service"
+	trainingsService "github.com/vaintrub/go-ddd-template/internal/trainings/service"
 )
 
 const (

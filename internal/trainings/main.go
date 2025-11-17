@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/logs"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/server"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/ports"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/service"
 	"github.com/go-chi/chi/v5"
+	"github.com/vaintrub/go-ddd-template/internal/common/logs"
+	"github.com/vaintrub/go-ddd-template/internal/common/server"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/ports"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/service"
 )
 
 func main() {

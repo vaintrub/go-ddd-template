@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/app/query"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/domain/training"
 	"github.com/pkg/errors"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/app/query"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -62,7 +62,7 @@ func (r TrainingsFirestoreRepository) GetTraining(
 	firestoreTraining, err := r.trainingsCollection().Doc(trainingUUID).Get(ctx)
 
 	if status.Code(err) == codes.NotFound {
-		return nil, training.NotFoundError{trainingUUID}
+		return nil, training.NotFoundError{TrainingUUID: trainingUUID}
 	}
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get actual docs")
@@ -196,7 +196,7 @@ func (r TrainingsFirestoreRepository) RemoveAllTrainings(ctx context.Context) er
 		iter := r.trainingsCollection().Limit(100).Documents(ctx)
 		numDeleted := 0
 
-		batch := r.firestoreClient.Batch()
+		bulkWriter := r.firestoreClient.BulkWriter(ctx)
 		for {
 			doc, err := iter.Next()
 			if err == iterator.Done {
@@ -206,7 +206,10 @@ func (r TrainingsFirestoreRepository) RemoveAllTrainings(ctx context.Context) er
 				return errors.Wrap(err, "unable to get document")
 			}
 
-			batch.Delete(doc.Ref)
+			_, err = bulkWriter.Delete(doc.Ref)
+			if err != nil {
+				return errors.Wrap(err, "unable to delete document")
+			}
 			numDeleted++
 		}
 
@@ -214,10 +217,7 @@ func (r TrainingsFirestoreRepository) RemoveAllTrainings(ctx context.Context) er
 			return nil
 		}
 
-		_, err := batch.Commit(ctx)
-		if err != nil {
-			return errors.Wrap(err, "unable to remove docs")
-		}
+		bulkWriter.End()
 	}
 }
 

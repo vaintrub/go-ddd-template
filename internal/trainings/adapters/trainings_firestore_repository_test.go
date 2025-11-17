@@ -2,20 +2,20 @@ package adapters_test
 
 import (
 	"context"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"testing"
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/adapters"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/app/query"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/domain/training"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/adapters"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/app/query"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
 // todo - make tests parallel after fix of emulator: https://github.com/firebase/firebase-tools/issues/2452
@@ -106,7 +106,7 @@ func TestTrainingsFirestoreRepository_GetTraining_not_exists(t *testing.T) {
 		training.MustNewUser(uuid.New().String(), training.Attendee),
 	)
 	assert.Nil(t, tr)
-	assert.EqualError(t, err, training.NotFoundError{trainingUUID}.Error())
+	assert.EqualError(t, err, training.NotFoundError{TrainingUUID: trainingUUID}.Error())
 }
 
 func TestTrainingsFirestoreRepository_get_and_update_another_users_training(t *testing.T) {
@@ -301,7 +301,8 @@ func newRandomTrainingTime() time.Time {
 	max := time.Date(2070, 1, 0, 0, 0, 0, 0, time.UTC).Unix()
 	delta := max - min
 
-	sec := rand.Int63n(delta) + min
+	// #nosec G404 - math/rand is sufficient for test data generation
+	sec := rand.Int64N(delta) + min
 	return time.Unix(sec, 0)
 }
 
@@ -386,7 +387,7 @@ func assertTrainingsEquals(t *testing.T, tr1, tr2 *training.Training) {
 	)
 }
 
-func assertQueryTrainingsEquals(t *testing.T, expectedTrainings, trainings []query.Training) bool {
+func assertQueryTrainingsEquals(t *testing.T, expectedTrainings, trainings []query.Training) {
 	t.Helper()
 	cmpOpts := []cmp.Option{
 		cmpRoundTimeOpt,
@@ -394,7 +395,7 @@ func assertQueryTrainingsEquals(t *testing.T, expectedTrainings, trainings []que
 			return x.Time.After(y.Time)
 		}),
 	}
-	return assert.True(t,
+	assert.True(t,
 		cmp.Equal(expectedTrainings, trainings, cmpOpts...),
 		cmp.Diff(expectedTrainings, trainings, cmpOpts...),
 	)

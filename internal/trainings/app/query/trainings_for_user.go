@@ -3,9 +3,9 @@ package query
 import (
 	"context"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/auth"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/decorator"
 	"github.com/sirupsen/logrus"
+	"github.com/vaintrub/go-ddd-template/internal/common/auth"
+	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
 )
 
 type TrainingsForUser struct {

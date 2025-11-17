@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/decorator"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/logs"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/domain/training"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
+	"github.com/vaintrub/go-ddd-template/internal/common/logs"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
 type ScheduleTraining struct {

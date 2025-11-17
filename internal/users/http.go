@@ -4,9 +4,9 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/auth"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/server/httperr"
 	"github.com/go-chi/render"
+	"github.com/vaintrub/go-ddd-template/internal/common/auth"
+	"github.com/vaintrub/go-ddd-template/internal/common/server/httperr"
 )
 
 type HttpServer struct {

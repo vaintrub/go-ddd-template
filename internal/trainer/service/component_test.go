@@ -8,14 +8,14 @@ import (
 	"testing"
 	"time"
 
-	trainerHTTP "github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/client/trainer"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/genproto/trainer"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/server"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/tests"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/ports"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	trainerHTTP "github.com/vaintrub/go-ddd-template/internal/common/client/trainer"
+	"github.com/vaintrub/go-ddd-template/internal/common/genproto/trainer"
+	"github.com/vaintrub/go-ddd-template/internal/common/server"
+	"github.com/vaintrub/go-ddd-template/internal/common/tests"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/ports"
 	"google.golang.org/grpc"
 )
 

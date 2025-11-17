@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package trainer;
 
-option go_package = "github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer";
+option go_package = "github.com/vaintrub/go-ddd-template/internal/common/genproto/trainer";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";

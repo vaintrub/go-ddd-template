@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/server/httperr"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
+	"github.com/vaintrub/go-ddd-template/internal/common/server/httperr"
 )
 
 // HttpMockMiddleware is used in the local environment (which doesn't depend on Firebase)

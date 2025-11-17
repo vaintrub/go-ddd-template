@@ -2,15 +2,15 @@ package main
 
 import (
 	"context"
-	"math/rand"
+	"math/rand/v2"
 	"time"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/client"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/app"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/app/command"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/app/query"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/vaintrub/go-ddd-template/internal/common/client"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/app"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/app/command"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/app/query"
 )
 
 const daysToSet = 30
@@ -48,7 +48,8 @@ func loadFixtures(app app.Application) {
 
 func loadTrainerFixtures(ctx context.Context, application app.Application) error {
 	maxDate := time.Now().AddDate(0, 0, daysToSet)
-	localRand := rand.New(rand.NewSource(3))
+	// #nosec G404 - math/rand is sufficient for fixture data generation
+	localRand := rand.New(rand.NewPCG(3, 0))
 
 	for date := time.Now(); date.Before(maxDate); date = date.AddDate(0, 0, 1) {
 		for hour := 12; hour <= 20; hour++ {

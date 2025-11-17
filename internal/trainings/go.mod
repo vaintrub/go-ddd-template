@@ -4,8 +4,6 @@ go 1.25.4
 
 require (
 	cloud.google.com/go/firestore v1.20.0
-	github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common v0.0.0-20251103104941-f264c714c5d6
-	github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings v0.0.0-20251103104941-f264c714c5d6
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-chi/render v1.0.3
 	github.com/google/go-cmp v0.7.0
@@ -85,3 +83,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251103181224-f26f9409b101 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/vaintrub/go-ddd-template/internal/common => ../common

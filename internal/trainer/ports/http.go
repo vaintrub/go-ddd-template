@@ -3,13 +3,13 @@ package ports
 import (
 	"net/http"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/auth"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/server/httperr"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/app"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/app/command"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainer/app/query"
 	"github.com/go-chi/render"
 	"github.com/oapi-codegen/runtime/types"
+	"github.com/vaintrub/go-ddd-template/internal/common/auth"
+	"github.com/vaintrub/go-ddd-template/internal/common/server/httperr"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/app"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/app/command"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/app/query"
 )
 
 type HttpServer struct {

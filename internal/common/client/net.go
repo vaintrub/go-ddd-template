@@ -1,25 +1,31 @@
 package client
 
 import (
+	"context"
 	"net"
 	"time"
 )
 
 func waitForPort(addr string, timeout time.Duration) bool {
 	portAvailable := make(chan struct{})
-	timeoutCh := time.After(timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 
 	go func() {
+		dialer := &net.Dialer{
+			Timeout: time.Second,
+		}
 		for {
 			select {
-			case <-timeoutCh:
+			case <-ctx.Done():
 				return
 			default:
 				// continue
 			}
 
-			_, err := net.Dial("tcp", addr)
+			conn, err := dialer.DialContext(ctx, "tcp", addr)
 			if err == nil {
+				_ = conn.Close()
 				close(portAvailable)
 				return
 			}
@@ -31,7 +37,7 @@ func waitForPort(addr string, timeout time.Duration) bool {
 	select {
 	case <-portAvailable:
 		return true
-	case <-timeoutCh:
+	case <-ctx.Done():
 		return false
 	}
 }

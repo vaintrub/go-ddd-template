@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/common/metrics"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/app/command"
-	"github.com/ThreeDotsLabs/wild-workouts-go-ddd-example/internal/trainings/domain/training"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
+	"github.com/vaintrub/go-ddd-template/internal/common/metrics"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/app/command"
+	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
 func TestCancelTraining(t *testing.T) {
