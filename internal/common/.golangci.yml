@@ -1,0 +1,63 @@
+version: 2
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  # In v2, instead of disable-all/enable-all, use 'default'
+  # Options: all, standard, fast, none
+  default: none
+
+  enable:
+    # Core linters (enabled by default)
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck  # includes gosimple checks
+    - unused
+
+    # Extra quality checks
+    - asciicheck
+    - bodyclose
+    - dogsled
+    - exhaustive
+    - gocognit
+    - goconst
+    - gosec
+    - misspell
+    - nakedret
+    - nestif
+    - noctx
+    - rowserrcheck
+    - sqlclosecheck
+    - unconvert
+    - unparam
+    - whitespace
+
+  settings:
+    exhaustive:
+      default-signifies-exhaustive: true
+
+# Formatters moved to separate section in v2
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+issues:
+  exclusions:
+    rules:
+      - path: '_test\.go'
+        linters:
+          - gosec
+          - noctx
+          - unparam
+          - bodyclose
+      - path: 'fixtures\.go'
+        linters:
+          - gosec
+    # You can also use presets
+    # presets:
+    #   - std-error-handling
+    #   - common-false-positives

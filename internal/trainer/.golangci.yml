@@ -1,0 +1,55 @@
+version: 2
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  default: none  # Replaces disable-all in v2
+
+  enable:
+    # Core linters (built into go toolchain)
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck  # Includes gosimple checks
+    - unused
+
+    # Additional quality checks
+    - asciicheck
+    - bodyclose
+    - dogsled
+    - exhaustive
+    - gocognit
+    - goconst
+    - gosec
+    - misspell
+    - nakedret
+    - nestif
+    - noctx
+    - rowserrcheck
+    - sqlclosecheck
+    - unconvert
+    - unparam
+    - whitespace
+
+  settings:
+    exhaustive:
+      default-signifies-exhaustive: true
+
+issues:
+  exclusions:
+    rules:
+      # Relax rules for test files
+      - path: '_test\.go'
+        linters:
+          - gosec
+          - noctx
+          - unparam
+          - bodyclose
+      # Relax rules for fixture files
+      - path: 'fixtures\.go'
+        linters:
+          - gosec
+      # Ignore composite literal warning
+      - text: 'composite literal uses unkeyed fields'

@@ -1,0 +1,41 @@
+version: 2
+
+linters:
+  default: none
+
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - asciicheck
+    - bodyclose
+    - dogsled
+    - exhaustive
+    - gocognit
+    - goconst
+    - gosec
+    - misspell
+    - nakedret
+    - nestif
+    - noctx
+    - rowserrcheck
+    - sqlclosecheck
+    - unconvert
+    - unparam
+    - whitespace
+
+issues:
+  exclusions:
+    rules:
+      - path: '_test\.go'
+        linters:
+          - gosec
+          - noctx
+          - unparam
+          - bodyclose
+      - path: 'fixtures\.go'
+        linters:
+          - gosec
+      - text: 'composite literal uses unkeyed fields'
