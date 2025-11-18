@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: Wild Workouts users
+  title: go-ddd-template users
   description: TODO
   contact:
     name: Three Dots Labs

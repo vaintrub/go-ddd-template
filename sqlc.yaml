@@ -1,0 +1,76 @@
+version: "2"
+sql:
+  # Trainings Context
+  - schema: "migrations/"
+    queries: "sql/queries/trainings.sql"
+    engine: "postgresql"
+    gen:
+      go:
+        package: "sqlc_trainings"
+        out: "internal/trainings/adapters/sqlc"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_prepared_queries: false
+        emit_interface: true
+        emit_exact_table_names: false
+        emit_pointers_for_null_types: true
+        query_parameter_limit: 10
+        overrides:
+          - db_type: "pg_catalog.uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+          - db_type: "pg_catalog.timestamptz"
+            go_type:
+              import: "time"
+              type: "Time"
+
+  # Users Context
+  - schema: "migrations/"
+    queries: "sql/queries/users.sql"
+    engine: "postgresql"
+    gen:
+      go:
+        package: "sqlc_users"
+        out: "internal/users/adapters/sqlc"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_prepared_queries: false
+        emit_interface: true
+        emit_exact_table_names: false
+        emit_pointers_for_null_types: true
+        query_parameter_limit: 10
+        overrides:
+          - db_type: "pg_catalog.uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+          - db_type: "pg_catalog.timestamptz"
+            go_type:
+              import: "time"
+              type: "Time"
+
+  # Trainer Context
+  - schema: "migrations/"
+    queries: "sql/queries/trainer.sql"
+    engine: "postgresql"
+    gen:
+      go:
+        package: "sqlc_trainer"
+        out: "internal/trainer/adapters/sqlc"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_prepared_queries: false
+        emit_interface: true
+        emit_exact_table_names: false
+        emit_pointers_for_null_types: true
+        query_parameter_limit: 10
+        overrides:
+          - db_type: "pg_catalog.uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+          - db_type: "pg_catalog.timestamptz"
+            go_type:
+              import: "time"
+              type: "Time"
