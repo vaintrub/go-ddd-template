@@ -2,30 +2,30 @@ package decorator
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/sirupsen/logrus"
+	"log/slog"
 )
 
 type commandLoggingDecorator[C any] struct {
 	base   CommandHandler[C]
-	logger *logrus.Entry
+	logger *slog.Logger
 }
 
 func (d commandLoggingDecorator[C]) Handle(ctx context.Context, cmd C) (err error) {
 	handlerType := generateActionName(cmd)
 
-	logger := d.logger.WithFields(logrus.Fields{
-		"command":      handlerType,
-		"command_body": fmt.Sprintf("%#v", cmd),
-	})
+	// Create child logger with command name
+	logger := d.logger.With(slog.String("command", handlerType))
 
-	logger.Debug("Executing command")
+	// Log command body only at DEBUG level to avoid logging sensitive data
+	logger.DebugContext(ctx, "Executing command", slog.Any("command_body", cmd))
+
 	defer func() {
 		if err == nil {
-			logger.Info("Command executed successfully")
+			logger.InfoContext(ctx, "Command executed successfully")
 		} else {
-			logger.WithError(err).Error("Failed to execute command")
+			logger.ErrorContext(ctx, "Failed to execute command",
+				slog.Any("error", err),
+			)
 		}
 	}()
 
@@ -34,21 +34,25 @@ func (d commandLoggingDecorator[C]) Handle(ctx context.Context, cmd C) (err erro
 
 type queryLoggingDecorator[C any, R any] struct {
 	base   QueryHandler[C, R]
-	logger *logrus.Entry
+	logger *slog.Logger
 }
 
 func (d queryLoggingDecorator[C, R]) Handle(ctx context.Context, cmd C) (result R, err error) {
-	logger := d.logger.WithFields(logrus.Fields{
-		"query":      generateActionName(cmd),
-		"query_body": fmt.Sprintf("%#v", cmd),
-	})
+	queryType := generateActionName(cmd)
 
-	logger.Debug("Executing query")
+	// Create child logger with query name
+	logger := d.logger.With(slog.String("query", queryType))
+
+	// Log query body only at DEBUG level to avoid logging sensitive data
+	logger.DebugContext(ctx, "Executing query", slog.Any("query_body", cmd))
+
 	defer func() {
 		if err == nil {
-			logger.Info("Query executed successfully")
+			logger.InfoContext(ctx, "Query executed successfully")
 		} else {
-			logger.WithError(err).Error("Failed to execute query")
+			logger.ErrorContext(ctx, "Failed to execute query",
+				slog.Any("error", err),
+			)
 		}
 	}()
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"log/slog"
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
 	"github.com/vaintrub/go-ddd-template/internal/common/errors"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/domain/hour"
@@ -22,7 +22,7 @@ type makeHoursUnavailableHandler struct {
 
 func NewMakeHoursUnavailableHandler(
 	hourRepo hour.Repository,
-	logger *logrus.Entry,
+	logger *slog.Logger,
 	metricsClient decorator.MetricsClient,
 ) MakeHoursUnavailableHandler {
 	if hourRepo == nil {

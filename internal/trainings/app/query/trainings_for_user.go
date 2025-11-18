@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 
-	"github.com/sirupsen/logrus"
+	"log/slog"
 	"github.com/vaintrub/go-ddd-template/internal/common/auth"
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
 )
@@ -20,7 +20,7 @@ type trainingsForUserHandler struct {
 
 func NewTrainingsForUserHandler(
 	readModel TrainingsForUserReadModel,
-	logger *logrus.Entry,
+	logger *slog.Logger,
 	metricsClient decorator.MetricsClient,
 ) TrainingsForUserHandler {
 	if readModel == nil {

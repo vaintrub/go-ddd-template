@@ -3,23 +3,12 @@ package server
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"os"
 
-	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
-	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
-	"github.com/sirupsen/logrus"
-	"github.com/vaintrub/go-ddd-template/internal/common/logs"
 	"google.golang.org/grpc"
 )
-
-func init() {
-	logger := logrus.New()
-	logs.SetFormatter(logger)
-	logger.SetLevel(logrus.WarnLevel)
-
-	grpc_logrus.ReplaceGrpcLogger(logrus.NewEntry(logger))
-}
 
 func RunGRPCServer(registerServer func(server *grpc.Server)) {
 	port := os.Getenv("PORT")
@@ -31,25 +20,29 @@ func RunGRPCServer(registerServer func(server *grpc.Server)) {
 }
 
 func RunGRPCServerOnAddr(addr string, registerServer func(server *grpc.Server)) {
-	logrusEntry := logrus.NewEntry(logrus.StandardLogger())
-
-	grpcServer := grpc.NewServer(
-		grpc.ChainUnaryInterceptor(
-			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
-			grpc_logrus.UnaryServerInterceptor(logrusEntry),
-		),
-		grpc.ChainStreamInterceptor(
-			grpc_ctxtags.StreamServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
-			grpc_logrus.StreamServerInterceptor(logrusEntry),
-		),
-	)
+	// Create gRPC server
+	// Request tracing can be added later with slog-based interceptors if needed
+	grpcServer := grpc.NewServer()
 	registerServer(grpcServer)
 
+	ctx := context.Background()
+
 	listenConfig := &net.ListenConfig{}
-	listen, err := listenConfig.Listen(context.Background(), "tcp", addr)
+	listen, err := listenConfig.Listen(ctx, "tcp", addr)
 	if err != nil {
-		logrus.Fatal(err)
+		slog.ErrorContext(ctx, "Failed to listen on gRPC address",
+			slog.String("addr", addr),
+			slog.Any("error", err),
+		)
+		panic(err)
 	}
-	logrus.WithField("grpcEndpoint", addr).Info("Starting: gRPC Listener")
-	logrus.Fatal(grpcServer.Serve(listen))
+
+	slog.InfoContext(ctx, "Starting gRPC server", slog.String("addr", addr))
+
+	if err := grpcServer.Serve(listen); err != nil {
+		slog.ErrorContext(ctx, "gRPC server failed",
+			slog.Any("error", err),
+		)
+		panic(err)
+	}
 }

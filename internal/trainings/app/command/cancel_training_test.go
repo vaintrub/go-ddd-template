@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"log/slog"
 	"github.com/stretchr/testify/require"
 	"github.com/vaintrub/go-ddd-template/internal/common/metrics"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/app/command"
@@ -130,7 +130,7 @@ func newDependencies() dependencies {
 	trainerService := &trainerServiceMock{}
 	userService := &userServiceMock{}
 
-	logger := logrus.NewEntry(logrus.StandardLogger())
+	logger := slog.Default()
 	metricsClient := metrics.NoOp{}
 
 	return dependencies{

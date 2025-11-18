@@ -96,7 +96,7 @@ func rollbackMigrations(t *testing.T, databaseURL string) error {
 	return nil
 }
 
-// T021: Test that up migration creates all tables
+// Test that up migration creates all tables
 func TestMigration001_Up_CreatesAllTables(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test")
@@ -135,7 +135,7 @@ func TestMigration001_Up_CreatesAllTables(t *testing.T) {
 	}
 }
 
-// T022: Test that down migration removes all tables cleanly
+// Test that down migration removes all tables cleanly
 func TestMigration001_Down_RemovesAllTables(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test")
@@ -177,7 +177,7 @@ func TestMigration001_Down_RemovesAllTables(t *testing.T) {
 	}
 }
 
-// T023: Test idempotency (running up twice succeeds)
+// Test idempotency (running up twice succeeds)
 func TestMigration001_Up_Idempotent(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test")
@@ -206,7 +206,7 @@ func TestMigration001_Up_Idempotent(t *testing.T) {
 	assert.Equal(t, 3, count, "all three tables should still exist after second migration")
 }
 
-// T024: Test that schema_migrations tracking table exists
+// Test that schema_migrations tracking table exists
 func TestMigration001_SchemaMigrationsTableExists(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test")

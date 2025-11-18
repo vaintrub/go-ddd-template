@@ -3,9 +3,8 @@ package command
 import (
 	"context"
 
-	"github.com/sirupsen/logrus"
+	"log/slog"
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
-	"github.com/vaintrub/go-ddd-template/internal/common/logs"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
@@ -22,7 +21,7 @@ type rejectTrainingRescheduleHandler struct {
 
 func NewRejectTrainingRescheduleHandler(
 	repo training.Repository,
-	logger *logrus.Entry,
+	logger *slog.Logger,
 	metricsClient decorator.MetricsClient,
 ) RejectTrainingRescheduleHandler {
 	if repo == nil {
@@ -37,10 +36,6 @@ func NewRejectTrainingRescheduleHandler(
 }
 
 func (h rejectTrainingRescheduleHandler) Handle(ctx context.Context, cmd RejectTrainingReschedule) (err error) {
-	defer func() {
-		logs.LogCommandExecution("RejectTrainingReschedule", cmd, err)
-	}()
-
 	return h.repo.UpdateTraining(
 		ctx,
 		cmd.TrainingUUID,

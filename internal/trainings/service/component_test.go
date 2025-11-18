@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"testing"
@@ -55,7 +54,7 @@ func TestCancelTraining(t *testing.T) {
 	require.NotContains(t, trainingsUUIDs, trainingUUID)
 }
 
-func startService() bool {
+func startService(t *testing.T) bool {
 	app := NewComponentTestApplication(context.Background())
 
 	trainingsHTTPAddr := os.Getenv("TRAININGS_HTTP_ADDR")
@@ -65,14 +64,15 @@ func startService() bool {
 
 	ok := tests.WaitForPort(trainingsHTTPAddr)
 	if !ok {
-		log.Println("Timed out waiting for trainings HTTP to come up")
+		t.Log("Timed out waiting for trainings HTTP to come up")
 	}
 
 	return ok
 }
 
 func TestMain(m *testing.M) {
-	if !startService() {
+	dummyT := &testing.T{}
+	if !startService(dummyT) {
 		os.Exit(1)
 	}
 

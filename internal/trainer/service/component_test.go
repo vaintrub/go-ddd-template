@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"net/http"
 	"os"
 	"testing"
@@ -70,7 +70,7 @@ func TestUnauthorizedForAttendee(t *testing.T) {
 	require.Equal(t, http.StatusUnauthorized, code)
 }
 
-func startService() bool {
+func startService(t *testing.T) bool {
 	app := NewApplication(context.Background())
 
 	trainerHTTPAddr := os.Getenv("TRAINER_HTTP_ADDR")
@@ -86,21 +86,24 @@ func startService() bool {
 
 	ok := tests.WaitForPort(trainerHTTPAddr)
 	if !ok {
-		log.Println("Timed out waiting for trainer HTTP to come up")
+		t.Log("Timed out waiting for trainer HTTP to come up")
 		return false
 	}
 
 	ok = tests.WaitForPort(trainerGrpcAddr)
 	if !ok {
-		log.Println("Timed out waiting for trainer gRPC to come up")
+		t.Log("Timed out waiting for trainer gRPC to come up")
 	}
 
 	return ok
 }
 
 func TestMain(m *testing.M) {
-	if !startService() {
-		log.Println("Timed out waiting for trainings HTTP to come up")
+	// Create a dummy testing.T for logging in setup
+	// In TestMain we can't use t.Log, so we use fmt.Fprintf to stderr
+	dummyT := &testing.T{}
+	if !startService(dummyT) {
+		fmt.Fprintln(os.Stderr, "Timed out waiting for services to come up")
 		os.Exit(1)
 	}
 

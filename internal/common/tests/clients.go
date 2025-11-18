@@ -3,6 +3,7 @@ package tests
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
@@ -82,7 +83,8 @@ type TrainingsHTTPClient struct {
 
 func NewTrainingsHTTPClient(t *testing.T, token string) TrainingsHTTPClient {
 	addr := os.Getenv("TRAININGS_HTTP_ADDR")
-	fmt.Println("Trying trainings http:", addr)
+	ctx := context.Background()
+	slog.DebugContext(ctx, "Trying trainings HTTP connection", slog.String("addr", addr))
 	ok := WaitForPort(addr)
 	require.True(t, ok, "Trainings HTTP timed out")
 

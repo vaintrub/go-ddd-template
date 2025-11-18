@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
+	"log/slog"
 
-	"github.com/sirupsen/logrus"
 	grpcClient "github.com/vaintrub/go-ddd-template/internal/common/client"
 	"github.com/vaintrub/go-ddd-template/internal/common/db"
 	"github.com/vaintrub/go-ddd-template/internal/common/metrics"
@@ -47,7 +47,7 @@ func newApplication(ctx context.Context, trainerGrpc command.TrainerService, use
 	// Use PostgreSQL repository instead of Firestore
 	trainingsRepository := adapters.NewTrainingPostgresRepository(pool)
 
-	logger := logrus.NewEntry(logrus.StandardLogger())
+	logger := slog.Default()
 	metricsClient := metrics.NoOp{}
 
 	return app.Application{

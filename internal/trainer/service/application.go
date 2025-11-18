@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/sirupsen/logrus"
+	"log/slog"
 	"github.com/vaintrub/go-ddd-template/internal/common/db"
 	"github.com/vaintrub/go-ddd-template/internal/common/metrics"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/adapters"
@@ -34,7 +34,7 @@ func NewApplication(ctx context.Context) app.Application {
 	// Use PostgreSQL repository instead of Firestore
 	hourRepository := adapters.NewHourPostgresRepository(pool, hourFactory)
 
-	logger := logrus.NewEntry(logrus.StandardLogger())
+	logger := slog.Default()
 	metricsClient := metrics.NoOp{}
 
 	return app.Application{
