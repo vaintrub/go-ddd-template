@@ -33,3 +33,37 @@ test:
 	@./scripts/test.sh trainer .test.env
 	@./scripts/test.sh trainings .test.env
 	@./scripts/test.sh users .test.env
+
+# Database Migration Targets
+.PHONY: migrate-up
+migrate-up:
+	@migrate -path migrations -database "$(DATABASE_URL)" -verbose up
+
+.PHONY: migrate-down
+migrate-down:
+	@migrate -path migrations -database "$(DATABASE_URL)" -verbose down 1
+
+.PHONY: migrate-create
+migrate-create:
+	@if [ -z "$(NAME)" ]; then \
+		echo "Error: NAME parameter is required. Usage: make migrate-create NAME=migration_name"; \
+		exit 1; \
+	fi
+	@migrate create -ext sql -dir migrations -seq $(NAME)
+
+.PHONY: migrate-status
+migrate-status:
+	@migrate -path migrations -database "$(DATABASE_URL)" version
+
+.PHONY: migrate-force
+migrate-force:
+	@if [ -z "$(V)" ]; then \
+		echo "Error: V parameter is required. Usage: make migrate-force V=version_number"; \
+		exit 1; \
+	fi
+	@migrate -path migrations -database "$(DATABASE_URL)" force $(V)
+
+# SQLC Code Generation
+.PHONY: sqlc-generate
+sqlc-generate:
+	@sqlc generate

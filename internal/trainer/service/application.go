@@ -2,10 +2,9 @@ package service
 
 import (
 	"context"
-	"os"
 
-	"cloud.google.com/go/firestore"
 	"github.com/sirupsen/logrus"
+	"github.com/vaintrub/go-ddd-template/internal/common/db"
 	"github.com/vaintrub/go-ddd-template/internal/common/metrics"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/adapters"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/app"
@@ -15,7 +14,8 @@ import (
 )
 
 func NewApplication(ctx context.Context) app.Application {
-	firestoreClient, err := firestore.NewClient(ctx, os.Getenv("GCP_PROJECT"))
+	// Initialize PostgreSQL connection pool
+	pool, err := db.NewPgxPool(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -26,14 +26,13 @@ func NewApplication(ctx context.Context) app.Application {
 		MaxUtcHour:               20,
 	}
 
-	datesRepository := adapters.NewDatesFirestoreRepository(firestoreClient, factoryConfig)
-
 	hourFactory, err := hour.NewFactory(factoryConfig)
 	if err != nil {
 		panic(err)
 	}
 
-	hourRepository := adapters.NewFirestoreHourRepository(firestoreClient, hourFactory)
+	// Use PostgreSQL repository instead of Firestore
+	hourRepository := adapters.NewHourPostgresRepository(pool, hourFactory)
 
 	logger := logrus.NewEntry(logrus.StandardLogger())
 	metricsClient := metrics.NoOp{}
@@ -47,7 +46,7 @@ func NewApplication(ctx context.Context) app.Application {
 		},
 		Queries: app.Queries{
 			HourAvailability:      query.NewHourAvailabilityHandler(hourRepository, logger, metricsClient),
-			TrainerAvailableHours: query.NewAvailableHoursHandler(datesRepository, logger, metricsClient),
+			TrainerAvailableHours: query.NewAvailableHoursHandler(hourRepository, logger, metricsClient),
 		},
 	}
 }

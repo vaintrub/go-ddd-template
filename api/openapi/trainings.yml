@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: Wild Workouts trainings
+  title: go-ddd-template trainings
   description: TODO
   contact:
     name: Three Dots Labs

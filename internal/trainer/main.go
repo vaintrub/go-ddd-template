@@ -26,7 +26,8 @@ func main() {
 	serverType := strings.ToLower(os.Getenv("SERVER_TO_RUN"))
 	switch serverType {
 	case "http":
-		go loadFixtures(application)
+		// Fixtures removed - use PostgreSQL migrations and direct inserts instead
+		// go loadFixtures(application)
 
 		server.RunHTTPServer(func(router chi.Router) http.Handler {
 			return ports.HandlerFromMux(

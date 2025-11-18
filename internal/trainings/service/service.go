@@ -2,11 +2,10 @@ package service
 
 import (
 	"context"
-	"os"
 
-	"cloud.google.com/go/firestore"
 	"github.com/sirupsen/logrus"
 	grpcClient "github.com/vaintrub/go-ddd-template/internal/common/client"
+	"github.com/vaintrub/go-ddd-template/internal/common/db"
 	"github.com/vaintrub/go-ddd-template/internal/common/metrics"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/adapters"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/app"
@@ -39,12 +38,14 @@ func NewComponentTestApplication(ctx context.Context) app.Application {
 }
 
 func newApplication(ctx context.Context, trainerGrpc command.TrainerService, usersGrpc command.UserService) app.Application {
-	client, err := firestore.NewClient(ctx, os.Getenv("GCP_PROJECT"))
+	// Initialize PostgreSQL connection pool
+	pool, err := db.NewPgxPool(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	trainingsRepository := adapters.NewTrainingsFirestoreRepository(client)
+	// Use PostgreSQL repository instead of Firestore
+	trainingsRepository := adapters.NewTrainingPostgresRepository(pool)
 
 	logger := logrus.NewEntry(logrus.StandardLogger())
 	metricsClient := metrics.NoOp{}

@@ -4,16 +4,14 @@ import (
 	"context"
 	"errors"
 	"math/rand/v2"
-	"os"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/vaintrub/go-ddd-template/internal/trainer/adapters"
-
-	"cloud.google.com/go/firestore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vaintrub/go-ddd-template/internal/common/db"
+	"github.com/vaintrub/go-ddd-template/internal/trainer/adapters"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/domain/hour"
 )
 
@@ -61,12 +59,8 @@ type Repository struct {
 func createRepositories(t *testing.T) []Repository {
 	return []Repository{
 		{
-			Name:       "Firebase",
-			Repository: newFirebaseRepository(t, context.Background()),
-		},
-		{
-			Name:       "MySQL",
-			Repository: newMySQLRepository(t),
+			Name:       "PostgreSQL",
+			Repository: newPostgresRepository(t, context.Background()),
 		},
 		{
 			Name:       "memory",
@@ -129,11 +123,6 @@ func testUpdateHour(t *testing.T, repository hour.Repository) {
 }
 
 func testUpdateHour_parallel(t *testing.T, repository hour.Repository) {
-	if _, ok := repository.(*adapters.FirestoreHourRepository); ok {
-		// todo - enable after fix of https://github.com/googleapis/google-cloud-go/issues/2604
-		t.Skip("because of emulator bug, it's not working in Firebase")
-	}
-
 	t.Helper()
 	ctx := context.Background()
 
@@ -257,33 +246,7 @@ func testHourRepository_update_existing(t *testing.T, repository hour.Repository
 	assertHourInRepository(ctx, t, repository, expectedHour)
 }
 
-func TestNewDateDTO(t *testing.T) {
-	t.Parallel()
-	testCases := []struct {
-		Time             time.Time
-		ExpectedDateTime time.Time
-	}{
-		{
-			Time:             time.Date(3333, 1, 1, 0, 0, 0, 0, time.UTC),
-			ExpectedDateTime: time.Date(3333, 1, 1, 0, 0, 0, 0, time.UTC),
-		},
-		{
-			// we are storing date in UTC
-			// it's still 1 January 22:00 in UTC while it's midnight in +2 timezone
-			Time:             time.Date(3333, 1, 2, 0, 0, 0, 0, time.FixedZone("FOO", 2*60*60)),
-			ExpectedDateTime: time.Date(3333, 1, 1, 0, 0, 0, 0, time.UTC),
-		},
-	}
-
-	for _, c := range testCases {
-		c := c
-		t.Run(c.Time.String(), func(t *testing.T) {
-			t.Parallel()
-			dateDTO := adapters.NewEmptyDateDTO(c.Time)
-			assert.True(t, dateDTO.Date.Equal(c.ExpectedDateTime), "%s != %s", dateDTO.Date, c.ExpectedDateTime)
-		})
-	}
-}
+// TestNewDateDTO removed - was testing Firestore-specific DTO no longer needed
 
 // in general global state is not the best idea, but sometimes rules have some exceptions!
 // in tests it's just simpler to re-use one instance of the factory
@@ -295,18 +258,11 @@ var testHourFactory = hour.MustNewFactory(hour.FactoryConfig{
 	MaxUtcHour:               24,
 })
 
-func newFirebaseRepository(t *testing.T, ctx context.Context) *adapters.FirestoreHourRepository {
-	firestoreClient, err := firestore.NewClient(ctx, os.Getenv("GCP_PROJECT"))
+func newPostgresRepository(t *testing.T, ctx context.Context) *adapters.HourPostgresRepository {
+	pool, err := db.NewPgxPool(ctx)
 	require.NoError(t, err)
 
-	return adapters.NewFirestoreHourRepository(firestoreClient, testHourFactory)
-}
-
-func newMySQLRepository(t *testing.T) *adapters.MySQLHourRepository {
-	db, err := adapters.NewMySQLConnection()
-	require.NoError(t, err)
-
-	return adapters.NewMySQLHourRepository(db, testHourFactory)
+	return adapters.NewHourPostgresRepository(pool, testHourFactory)
 }
 
 func newValidAvailableHour(t *testing.T) *hour.Hour {

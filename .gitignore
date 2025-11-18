@@ -19,6 +19,7 @@ vendor/
 # Tools
 .idea
 .claude
+.specify
 
 .terraform
 *.tfstate
@@ -35,3 +36,25 @@ terraform/cloud-builders-community
 
 .go/
 .go-cache/
+
+# Environment variables
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
