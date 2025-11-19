@@ -3,11 +3,11 @@ package client
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"os"
-	"strconv"
-	"time"
 
 	"github.com/pkg/errors"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	"github.com/vaintrub/go-ddd-template/internal/common/genproto/trainer"
 	"github.com/vaintrub/go-ddd-template/internal/common/genproto/users"
 	"google.golang.org/grpc"
@@ -15,54 +15,41 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func NewTrainerClient() (client trainer.TrainerServiceClient, close func() error, err error) {
-	grpcAddr := os.Getenv("TRAINER_GRPC_ADDR")
-	if grpcAddr == "" {
-		return nil, func() error { return nil }, errors.New("empty env TRAINER_GRPC_ADDR")
-	}
-
-	opts, err := grpcDialOpts(grpcAddr)
-	if err != nil {
-		return nil, func() error { return nil }, err
-	}
-
-	conn, err := grpc.NewClient(grpcAddr, opts...)
-	if err != nil {
-		return nil, func() error { return nil }, err
-	}
-
-	return trainer.NewTrainerServiceClient(conn), conn.Close, nil
+func NewTrainerClient(cfg config.GRPCConfig) (client trainer.TrainerServiceClient, close func() error, err error) {
+	return newClient(cfg.TrainerAddr, cfg, func(conn grpc.ClientConnInterface) trainer.TrainerServiceClient {
+		return trainer.NewTrainerServiceClient(conn)
+	})
 }
 
-func WaitForTrainerService(timeout time.Duration) bool {
-	return waitForPort(os.Getenv("TRAINER_GRPC_ADDR"), timeout)
+func NewUsersClient(cfg config.GRPCConfig) (client users.UsersServiceClient, close func() error, err error) {
+	return newClient(cfg.UsersAddr, cfg, func(conn grpc.ClientConnInterface) users.UsersServiceClient {
+		return users.NewUsersServiceClient(conn)
+	})
 }
 
-func NewUsersClient() (client users.UsersServiceClient, close func() error, err error) {
-	grpcAddr := os.Getenv("USERS_GRPC_ADDR")
-	if grpcAddr == "" {
-		return nil, func() error { return nil }, errors.New("empty env USERS_GRPC_ADDR")
+type clientFactory[T any] func(grpc.ClientConnInterface) T
+
+func newClient[T any](addr string, cfg config.GRPCConfig, factory clientFactory[T]) (T, func() error, error) {
+	var zero T
+	if addr == "" {
+		return zero, func() error { return nil }, fmt.Errorf("grpc address is required")
 	}
 
-	opts, err := grpcDialOpts(grpcAddr)
+	opts, err := grpcDialOpts(addr, cfg)
 	if err != nil {
-		return nil, func() error { return nil }, err
+		return zero, func() error { return nil }, err
 	}
 
-	conn, err := grpc.NewClient(grpcAddr, opts...)
+	conn, err := grpc.NewClient(addr, opts...)
 	if err != nil {
-		return nil, func() error { return nil }, err
+		return zero, func() error { return nil }, err
 	}
 
-	return users.NewUsersServiceClient(conn), conn.Close, nil
+	return factory(conn), conn.Close, nil
 }
 
-func WaitForUsersService(timeout time.Duration) bool {
-	return waitForPort(os.Getenv("USERS_GRPC_ADDR"), timeout)
-}
-
-func grpcDialOpts(grpcAddr string) ([]grpc.DialOption, error) {
-	if noTLS, _ := strconv.ParseBool(os.Getenv("GRPC_NO_TLS")); noTLS {
+func grpcDialOpts(addr string, cfg config.GRPCConfig) ([]grpc.DialOption, error) {
+	if cfg.NoTLS {
 		return []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}, nil
 	}
 
@@ -70,13 +57,34 @@ func grpcDialOpts(grpcAddr string) ([]grpc.DialOption, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot load root CA cert")
 	}
-	creds := credentials.NewTLS(&tls.Config{
+
+	tlsConfig := &tls.Config{
 		RootCAs:    systemRoots,
 		MinVersion: tls.VersionTLS12,
-	})
+	}
+	if cfg.CAFile != "" {
+		certPool, loadErr := loadCertPool(cfg.CAFile)
+		if loadErr != nil {
+			return nil, loadErr
+		}
+		tlsConfig.RootCAs = certPool
+	}
 
 	return []grpc.DialOption{
-		grpc.WithTransportCredentials(creds),
-		grpc.WithPerRPCCredentials(newMetadataServerToken(grpcAddr)),
+		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
+		grpc.WithPerRPCCredentials(newMetadataServerToken(addr)),
 	}, nil
+}
+
+func loadCertPool(path string) (*x509.CertPool, error) {
+	// #nosec G304 - CA file path is provided via configuration managed by trusted deployment.
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot read CA file")
+	}
+	pool := x509.NewCertPool()
+	if ok := pool.AppendCertsFromPEM(data); !ok {
+		return nil, fmt.Errorf("failed to append CA certs from %s", path)
+	}
+	return pool, nil
 }

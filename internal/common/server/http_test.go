@@ -6,16 +6,18 @@ import (
 	"testing"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	commonctx "github.com/vaintrub/go-ddd-template/internal/common/context"
 	"github.com/vaintrub/go-ddd-template/internal/common/logs"
 )
 
 func TestMiddlewareStackIntegration(t *testing.T) {
-	logger := logs.Init()
+	logger := logs.Init(config.LoggingConfig{Level: "DEBUG", AddSource: true})
+	serverCfg := config.ServerConfig{MockAuth: true}
 
 	// Create a test router using the actual middleware setup pattern
 	router := chi.NewRouter()
-	setMiddlewares(router, logger)
+	setMiddlewares(router, logger, serverCfg)
 
 	var capturedRequestID string
 
@@ -48,10 +50,11 @@ func TestMiddlewareStackIntegration(t *testing.T) {
 
 // Test middleware stack doesn't break existing functionality
 func TestMiddlewareStackPreservesExistingBehavior(t *testing.T) {
-	logger := logs.Init()
+	logger := logs.Init(config.LoggingConfig{Level: "INFO"})
+	serverCfg := config.ServerConfig{MockAuth: true}
 
 	router := chi.NewRouter()
-	setMiddlewares(router, logger)
+	setMiddlewares(router, logger, serverCfg)
 
 	// Test route that returns JSON
 	router.Get("/api/users", func(w http.ResponseWriter, r *http.Request) {

@@ -4,8 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
 	"log/slog"
+
+	"github.com/pkg/errors"
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )

@@ -4,11 +4,10 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 )
 
 // NewPgxPool creates a new PostgreSQL connection pool with environment-based configuration.
@@ -24,69 +23,50 @@ import (
 // Returns:
 //   - *pgxpool.Pool: Configured connection pool
 //   - error: Configuration or connection error
-func NewPgxPool(ctx context.Context) (*pgxpool.Pool, error) {
-	databaseURL := os.Getenv("DATABASE_URL")
-	if databaseURL == "" {
-		return nil, fmt.Errorf("DATABASE_URL environment variable is required")
+func NewPgxPool(ctx context.Context, dbCfg config.DatabaseConfig, envCfg config.EnvConfig) (*pgxpool.Pool, error) {
+	if dbCfg.URL == "" {
+		return nil, fmt.Errorf("database URL is required")
 	}
 
-	// Parse the DATABASE_URL
-	config, err := pgxpool.ParseConfig(databaseURL)
+	poolConfig, err := pgxpool.ParseConfig(dbCfg.URL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse DATABASE_URL: %w", err)
+		return nil, fmt.Errorf("failed to parse database URL: %w", err)
 	}
 
-	// Configure connection pool limits
-	config.MaxConns = getEnvInt("DB_POOL_MAX_CONNS", 25)
-	config.MinConns = getEnvInt("DB_POOL_MIN_CONNS", 5)
+	if dbCfg.MaxConns > 0 {
+		poolConfig.MaxConns = dbCfg.MaxConns
+	}
+	if dbCfg.MinConns > 0 {
+		poolConfig.MinConns = dbCfg.MinConns
+	}
 
-	// Configure connection lifecycle
-	config.MaxConnLifetime = time.Hour        // Recycle connections after 1 hour
-	config.MaxConnIdleTime = 30 * time.Minute // Close idle connections after 30 minutes
-	config.HealthCheckPeriod = time.Minute    // Check connection health every minute
+	poolConfig.MaxConnLifetime = time.Hour
+	poolConfig.MaxConnIdleTime = 30 * time.Minute
+	poolConfig.HealthCheckPeriod = time.Minute
 
-	// Configure connection timeout (FR-017a: 30s default)
-	timeoutSeconds := getEnvInt("DB_POOL_TIMEOUT", 30)
-	config.ConnConfig.ConnectTimeout = time.Duration(timeoutSeconds) * time.Second
+	timeout := dbCfg.Timeout
+	if timeout <= 0 {
+		timeout = 30 * time.Second
+	}
+	poolConfig.ConnConfig.ConnectTimeout = timeout
 
-	// Configure SSL/TLS based on environment
-	env := os.Getenv("ENV")
-	if env == "production" {
-		// Production: Require TLS with minimum TLS 1.2
-		config.ConnConfig.TLSConfig = &tls.Config{
+	if envCfg.Name == "production" || dbCfg.SSLRequired {
+		poolConfig.ConnConfig.TLSConfig = &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		}
 	}
-	// Development: No SSL (sslmode=disable in DATABASE_URL)
 
-	// Create the connection pool
-	pool, err := pgxpool.NewWithConfig(ctx, config)
+	pool, err := pgxpool.NewWithConfig(ctx, poolConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create connection pool: %w", err)
 	}
 
-	// Verify the connection
 	if err := pool.Ping(ctx); err != nil {
 		pool.Close()
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
 	return pool, nil
-}
-
-// getEnvInt retrieves an integer environment variable with a default fallback.
-func getEnvInt(key string, defaultValue int32) int32 {
-	valueStr := os.Getenv(key)
-	if valueStr == "" {
-		return defaultValue
-	}
-
-	value, err := strconv.ParseInt(valueStr, 10, 32)
-	if err != nil {
-		return defaultValue
-	}
-
-	return int32(value)
 }
 
 // Close gracefully closes the connection pool, waiting for connections to be released.

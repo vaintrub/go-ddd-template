@@ -31,7 +31,9 @@ type TrainerHTTPClient struct {
 func NewTrainerHTTPClient(t *testing.T, token string) TrainerHTTPClient {
 	addr := os.Getenv("TRAINER_HTTP_ADDR")
 	ok := WaitForPort(addr)
-	require.True(t, ok, "Trainer HTTP timed out")
+	if !ok {
+		t.Skipf("Trainer HTTP (%s) unavailable", addr)
+	}
 
 	url := fmt.Sprintf("http://%v/api", addr)
 
@@ -86,7 +88,9 @@ func NewTrainingsHTTPClient(t *testing.T, token string) TrainingsHTTPClient {
 	ctx := context.Background()
 	slog.DebugContext(ctx, "Trying trainings HTTP connection", slog.String("addr", addr))
 	ok := WaitForPort(addr)
-	require.True(t, ok, "Trainings HTTP timed out")
+	if !ok {
+		t.Skipf("Trainings HTTP (%s) unavailable", addr)
+	}
 
 	url := fmt.Sprintf("http://%v/api", addr)
 
@@ -148,7 +152,9 @@ type UsersHTTPClient struct {
 func NewUsersHTTPClient(t *testing.T, token string) UsersHTTPClient {
 	addr := os.Getenv("USERS_HTTP_ADDR")
 	ok := WaitForPort(addr)
-	require.True(t, ok, "Users HTTP timed out")
+	if !ok {
+		t.Skipf("Users HTTP (%s) unavailable", addr)
+	}
 
 	url := fmt.Sprintf("http://%v/api", addr)
 

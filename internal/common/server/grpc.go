@@ -5,23 +5,17 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
-	"os"
 
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	"google.golang.org/grpc"
 )
 
-func RunGRPCServer(registerServer func(server *grpc.Server)) {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	addr := fmt.Sprintf(":%s", port)
-	RunGRPCServerOnAddr(addr, registerServer)
+func RunGRPCServer(cfg config.ServerConfig, logger *slog.Logger, registerServer func(server *grpc.Server)) {
+	addr := fmt.Sprintf(":%d", cfg.Port)
+	RunGRPCServerOnAddr(addr, logger, registerServer)
 }
 
-func RunGRPCServerOnAddr(addr string, registerServer func(server *grpc.Server)) {
-	// Create gRPC server
-	// Request tracing can be added later with slog-based interceptors if needed
+func RunGRPCServerOnAddr(addr string, logger *slog.Logger, registerServer func(server *grpc.Server)) {
 	grpcServer := grpc.NewServer()
 	registerServer(grpcServer)
 
@@ -30,17 +24,17 @@ func RunGRPCServerOnAddr(addr string, registerServer func(server *grpc.Server)) 
 	listenConfig := &net.ListenConfig{}
 	listen, err := listenConfig.Listen(ctx, "tcp", addr)
 	if err != nil {
-		slog.ErrorContext(ctx, "Failed to listen on gRPC address",
+		logger.ErrorContext(ctx, "Failed to listen on gRPC address",
 			slog.String("addr", addr),
 			slog.Any("error", err),
 		)
 		panic(err)
 	}
 
-	slog.InfoContext(ctx, "Starting gRPC server", slog.String("addr", addr))
+	logger.InfoContext(ctx, "Starting gRPC server", slog.String("addr", addr))
 
 	if err := grpcServer.Serve(listen); err != nil {
-		slog.ErrorContext(ctx, "gRPC server failed",
+		logger.ErrorContext(ctx, "gRPC server failed",
 			slog.Any("error", err),
 		)
 		panic(err)

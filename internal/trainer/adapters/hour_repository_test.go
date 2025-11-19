@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"math/rand/v2"
+	"os"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	"github.com/vaintrub/go-ddd-template/internal/common/db"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/adapters"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/domain/hour"
@@ -259,7 +261,19 @@ var testHourFactory = hour.MustNewFactory(hour.FactoryConfig{
 })
 
 func newPostgresRepository(t *testing.T, ctx context.Context) *adapters.HourPostgresRepository {
-	pool, err := db.NewPgxPool(ctx)
+	dbURL := os.Getenv("DATABASE_URL")
+	require.NotEmpty(t, dbURL, "DATABASE_URL must be set for repository tests")
+
+	cfg := config.Config{
+		Env: config.EnvConfig{
+			Name: os.Getenv("ENV"),
+		},
+		Database: config.DatabaseConfig{
+			URL: dbURL,
+		},
+	}
+
+	pool, err := db.NewPgxPool(ctx, cfg.Database, cfg.Env)
 	require.NoError(t, err)
 
 	return adapters.NewHourPostgresRepository(pool, testHourFactory)

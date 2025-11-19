@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"log/slog"
+
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
 	"github.com/vaintrub/go-ddd-template/internal/common/errors"
 )

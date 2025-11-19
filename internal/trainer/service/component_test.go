@@ -12,7 +12,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	trainerHTTP "github.com/vaintrub/go-ddd-template/internal/common/client/trainer"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	"github.com/vaintrub/go-ddd-template/internal/common/genproto/trainer"
+	"github.com/vaintrub/go-ddd-template/internal/common/logs"
 	"github.com/vaintrub/go-ddd-template/internal/common/server"
 	"github.com/vaintrub/go-ddd-template/internal/common/tests"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/ports"
@@ -71,17 +73,19 @@ func TestUnauthorizedForAttendee(t *testing.T) {
 }
 
 func startService(t *testing.T) bool {
-	app := NewApplication(context.Background())
+	app := NewApplication(context.Background(), componentTestConfig())
+	logger := logs.Init(config.LoggingConfig{Level: "INFO"})
+	serverCfg := config.ServerConfig{MockAuth: true}
 
 	trainerHTTPAddr := os.Getenv("TRAINER_HTTP_ADDR")
-	go server.RunHTTPServerOnAddr(trainerHTTPAddr, func(router chi.Router) http.Handler {
+	go server.RunHTTPServerOnAddr(serverCfg, trainerHTTPAddr, logger, func(router chi.Router) http.Handler {
 		return ports.HandlerFromMux(ports.NewHttpServer(app), router)
 	})
 
 	trainerGrpcAddr := os.Getenv("TRAINER_GRPC_ADDR")
-	go server.RunGRPCServerOnAddr(trainerGrpcAddr, func(server *grpc.Server) {
+	go server.RunGRPCServerOnAddr(trainerGrpcAddr, logger, func(s *grpc.Server) {
 		svc := ports.NewGrpcServer(app)
-		trainer.RegisterTrainerServiceServer(server, svc)
+		trainer.RegisterTrainerServiceServer(s, svc)
 	})
 
 	ok := tests.WaitForPort(trainerHTTPAddr)
@@ -108,4 +112,13 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(m.Run())
+}
+
+func componentTestConfig() config.Config {
+	cfg := config.DefaultConfig()
+	cfg.Database.URL = os.Getenv("DATABASE_URL")
+	cfg.GRPC.TrainerAddr = os.Getenv("TRAINER_GRPC_ADDR")
+	cfg.GRPC.UsersAddr = os.Getenv("USERS_GRPC_ADDR")
+	cfg.Server.Port = 0
+	return cfg
 }

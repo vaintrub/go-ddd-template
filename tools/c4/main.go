@@ -8,6 +8,7 @@ import (
 	"github.com/krzysztofreczek/go-structurizr/pkg/scraper"
 	"github.com/krzysztofreczek/go-structurizr/pkg/view"
 
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	trainerService "github.com/vaintrub/go-ddd-template/internal/trainer/service"
 	trainingsService "github.com/vaintrub/go-ddd-template/internal/trainings/service"
 )
@@ -21,10 +22,12 @@ const (
 func main() {
 	ctx := context.Background()
 
-	trainerApp := trainerService.NewApplication(ctx)
+	cfg := config.MustLoad(ctx)
+
+	trainerApp := trainerService.NewApplication(ctx, cfg)
 	scrape(trainerApp, "trainer")
 
-	trainingsApp, _ := trainingsService.NewApplication(ctx)
+	trainingsApp, _ := trainingsService.NewApplication(ctx, cfg)
 	scrape(trainingsApp, "trainings")
 }
 
