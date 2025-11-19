@@ -5,9 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"log/slog"
+
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"log/slog"
 	"github.com/stretchr/testify/require"
 	"github.com/vaintrub/go-ddd-template/internal/common/metrics"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/app/command"

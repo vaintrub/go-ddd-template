@@ -2,8 +2,9 @@ package logs
 
 import (
 	"log/slog"
-	"os"
 	"testing"
+
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 )
 
 func TestInitParsesLogLevel(t *testing.T) {
@@ -21,12 +22,7 @@ func TestInitParsesLogLevel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Set environment variable
-			_ = os.Setenv("LOG_LEVEL", tt.logLevel)
-			defer func() { _ = os.Unsetenv("LOG_LEVEL") }()
-
-			// Initialize logger
-			logger := Init()
+			logger := Init(config.LoggingConfig{Level: tt.logLevel, AddSource: true})
 
 			// Test that the logger works
 			if logger == nil {
@@ -42,10 +38,7 @@ func TestInitParsesLogLevel(t *testing.T) {
 }
 
 func TestInitDefaultsToInfo(t *testing.T) {
-	// Ensure LOG_LEVEL is not set
-	_ = os.Unsetenv("LOG_LEVEL")
-
-	logger := Init()
+	logger := Init(config.LoggingConfig{})
 
 	if logger == nil {
 		t.Fatal("Expected logger to be initialized")
@@ -57,13 +50,7 @@ func TestInitDefaultsToInfo(t *testing.T) {
 }
 
 func TestInitCreatesTextHandlerToStdout(t *testing.T) {
-	// We can't easily test stdout capture, but we can verify the logger is created
-	// with proper configuration
-
-	_ = os.Setenv("LOG_LEVEL", "INFO")
-	defer func() { _ = os.Unsetenv("LOG_LEVEL") }()
-
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 
 	if logger == nil {
 		t.Fatal("Expected logger to be initialized")
@@ -122,12 +109,7 @@ func TestParseLogLevel_Invalid(t *testing.T) {
 
 // Test: ContextHandler integration with Init()
 func TestInitIntegratesContextHandler(t *testing.T) {
-	_ = os.Setenv("LOG_LEVEL", "DEBUG")
-	defer func() { _ = os.Unsetenv("LOG_LEVEL") }()
-
-	// Capture stdout (in real test, you'd use a different approach)
-	// For now, just verify Init() works with ContextHandler
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "DEBUG"})
 
 	// Create a child logger to test
 	// The ContextHandler should be in the chain
@@ -139,12 +121,7 @@ func TestInitIntegratesContextHandler(t *testing.T) {
 
 // Test: AddSource is enabled
 func TestInitEnablesAddSource(t *testing.T) {
-	// We'll need to test this differently since we can't easily check HandlerOptions
-	// For now, verify that the logger is created successfully
-	_ = os.Setenv("LOG_LEVEL", "INFO")
-	defer func() { _ = os.Unsetenv("LOG_LEVEL") }()
-
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO", AddSource: true})
 
 	if logger == nil {
 		t.Fatal("Expected logger with AddSource to be initialized")
@@ -156,11 +133,7 @@ func TestInitEnablesAddSource(t *testing.T) {
 
 // Test: TextHandler format
 func TestInitUsesTextHandler(t *testing.T) {
-	_ = os.Setenv("LOG_LEVEL", "INFO")
-	defer func() { _ = os.Unsetenv("LOG_LEVEL") }()
-
-	// Initialize logger
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 
 	// Verify it's not nil
 	if logger == nil {
@@ -177,9 +150,6 @@ func TestInitUsesTextHandler(t *testing.T) {
 
 // Additional test to use unused variables
 func TestInitCreatesWorkingLogger(t *testing.T) {
-	_ = os.Setenv("LOG_LEVEL", "INFO")
-	defer func() { _ = os.Unsetenv("LOG_LEVEL") }()
-
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 	logger.Info("test message")
 }

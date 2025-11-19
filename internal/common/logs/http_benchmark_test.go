@@ -8,11 +8,12 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	commonctx "github.com/vaintrub/go-ddd-template/internal/common/context"
 )
 
 func BenchmarkHTTPMiddlewareOverhead(b *testing.B) {
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 
 	// Create router with logging middleware
 	r := chi.NewRouter()

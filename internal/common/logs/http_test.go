@@ -10,12 +10,13 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	commonctx "github.com/vaintrub/go-ddd-template/internal/common/context"
 )
 
 func TestHTTPMiddlewareLogsRequestStart(t *testing.T) {
 	// Create a test logger (we'll verify by checking logs are called)
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 
 	// Create test router with middleware
 	r := chi.NewRouter()
@@ -43,7 +44,7 @@ func TestHTTPMiddlewareLogsRequestStart(t *testing.T) {
 }
 
 func TestHTTPMiddlewareLogsRequestCompletion(t *testing.T) {
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -75,7 +76,7 @@ func TestHTTPMiddlewareLogsRequestCompletion(t *testing.T) {
 }
 
 func TestRequestIDExtractionFromHeader(t *testing.T) {
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 
 	var capturedRequestID string
 
@@ -103,7 +104,7 @@ func TestRequestIDExtractionFromHeader(t *testing.T) {
 }
 
 func TestUUIDGenerationWhenHeaderMissing(t *testing.T) {
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 
 	var capturedRequestID string
 
@@ -133,7 +134,7 @@ func TestUUIDGenerationWhenHeaderMissing(t *testing.T) {
 }
 
 func TestRequestIDPropagatesThroughContext(t *testing.T) {
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 
 	var handlerRequestID string
 	var nestedRequestID string
@@ -178,7 +179,7 @@ func simulateNestedFunction(ctx context.Context) string {
 
 // Additional test: Multiple concurrent requests have different request IDs
 func TestConcurrentRequestsHaveDifferentIDs(t *testing.T) {
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 
 	requestIDs := make(chan string, 10)
 
@@ -218,7 +219,7 @@ func TestConcurrentRequestsHaveDifferentIDs(t *testing.T) {
 
 // Test: Context without request ID doesn't break logging
 func TestContextWithoutRequestIDWorks(t *testing.T) {
-	logger := Init()
+	logger := Init(config.LoggingConfig{Level: "INFO"})
 
 	r := chi.NewRouter()
 	// Skip middleware.RequestID to test fallback

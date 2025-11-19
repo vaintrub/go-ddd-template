@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	commondb "github.com/vaintrub/go-ddd-template/internal/common/db"
 	"github.com/vaintrub/go-ddd-template/internal/common/genproto/users"
 	"github.com/vaintrub/go-ddd-template/internal/common/logs"
@@ -50,12 +51,11 @@ func (p *postgresDB) UpdateLastIP(ctx context.Context, userID string, ip string)
 }
 
 func main() {
-	logs.Init()
-
 	ctx := context.Background()
+	cfg := config.MustLoad(ctx)
+	logger := logs.Init(cfg.Logging)
 
-	// Initialize PostgreSQL connection pool
-	pool, err := commondb.NewPgxPool(ctx)
+	pool, err := commondb.NewPgxPool(ctx, cfg.Database, cfg.Env)
 	if err != nil {
 		panic(err)
 	}
@@ -70,11 +70,11 @@ func main() {
 		// TODO: Update loadFixtures() to work with PostgreSQL instead of Firebase
 		// go loadFixtures()
 
-		server.RunHTTPServer(func(router chi.Router) http.Handler {
+		server.RunHTTPServer(cfg.Server, logger, func(router chi.Router) http.Handler {
 			return HandlerFromMux(HttpServer{postgresDB}, router)
 		})
 	case "grpc":
-		server.RunGRPCServer(func(server *grpc.Server) {
+		server.RunGRPCServer(cfg.Server, logger, func(server *grpc.Server) {
 			svc := GrpcServer{postgresDB}
 			users.RegisterUsersServiceServer(server, svc)
 		})

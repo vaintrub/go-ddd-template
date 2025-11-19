@@ -2,8 +2,9 @@ package service
 
 import (
 	"context"
-
 	"log/slog"
+
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	"github.com/vaintrub/go-ddd-template/internal/common/db"
 	"github.com/vaintrub/go-ddd-template/internal/common/metrics"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/adapters"
@@ -13,9 +14,8 @@ import (
 	"github.com/vaintrub/go-ddd-template/internal/trainer/domain/hour"
 )
 
-func NewApplication(ctx context.Context) app.Application {
-	// Initialize PostgreSQL connection pool
-	pool, err := db.NewPgxPool(ctx)
+func NewApplication(ctx context.Context, cfg config.Config) app.Application {
+	pool, err := db.NewPgxPool(ctx, cfg.Database, cfg.Env)
 	if err != nil {
 		panic(err)
 	}

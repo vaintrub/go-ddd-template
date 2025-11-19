@@ -2,16 +2,24 @@ package tests
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"github.com/vaintrub/go-ddd-template/internal/common/client"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	"github.com/vaintrub/go-ddd-template/internal/common/genproto/users"
 )
 
 func TestCreateTraining(t *testing.T) {
-	t.Parallel()
+	if os.Getenv("RUN_E2E_TESTS") != "1" {
+		t.Skip("RUN_E2E_TESTS not set; skipping e2e flow")
+	}
+
+	t.Setenv("APP_ENV", "development")
+	t.Setenv("ENV", "development")
+	t.Setenv("ENV_NAME", "development")
 
 	hour := RelativeDate(12, 12)
 
@@ -22,7 +30,9 @@ func TestCreateTraining(t *testing.T) {
 	trainingsHTTPClient := NewTrainingsHTTPClient(t, attendeeJWT)
 	usersHTTPClient := NewUsersHTTPClient(t, attendeeJWT)
 
-	usersGrpcClient, _, err := client.NewUsersClient()
+	cfg := config.MustLoad(context.Background())
+
+	usersGrpcClient, _, err := client.NewUsersClient(cfg.GRPC)
 	require.NoError(t, err)
 
 	// Cancel the training if exists and make the hour available

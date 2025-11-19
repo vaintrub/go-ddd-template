@@ -9,6 +9,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
+	"github.com/vaintrub/go-ddd-template/internal/common/logs"
 	"github.com/vaintrub/go-ddd-template/internal/common/server"
 	"github.com/vaintrub/go-ddd-template/internal/common/tests"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/ports"
@@ -55,10 +57,12 @@ func TestCancelTraining(t *testing.T) {
 }
 
 func startService(t *testing.T) bool {
-	app := NewComponentTestApplication(context.Background())
+	app := NewComponentTestApplication(context.Background(), componentTestConfig())
+	logger := logs.Init(config.LoggingConfig{Level: "INFO"})
+	serverCfg := config.ServerConfig{MockAuth: true}
 
 	trainingsHTTPAddr := os.Getenv("TRAININGS_HTTP_ADDR")
-	go server.RunHTTPServerOnAddr(trainingsHTTPAddr, func(router chi.Router) http.Handler {
+	go server.RunHTTPServerOnAddr(serverCfg, trainingsHTTPAddr, logger, func(router chi.Router) http.Handler {
 		return ports.HandlerFromMux(ports.NewHttpServer(app), router)
 	})
 
@@ -68,6 +72,15 @@ func startService(t *testing.T) bool {
 	}
 
 	return ok
+}
+
+func componentTestConfig() config.Config {
+	cfg := config.DefaultConfig()
+	cfg.Database.URL = os.Getenv("DATABASE_URL")
+	cfg.GRPC.TrainerAddr = os.Getenv("TRAINER_GRPC_ADDR")
+	cfg.GRPC.UsersAddr = os.Getenv("USERS_GRPC_ADDR")
+	cfg.Server.Port = 0
+	return cfg
 }
 
 func TestMain(m *testing.M) {

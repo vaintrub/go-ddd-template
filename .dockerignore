@@ -1,0 +1,35 @@
+# Exclude unnecessary files from Docker build context
+.git
+.gitignore
+.dockerignore
+
+# Repository metadata and tooling
+.claude
+.codex
+.specify
+.idea
+
+# Environment and secrets
+.env
+.env.*
+*.env
+
+# Logs and temporary artifacts
+*.log
+*.tmp
+*.swp
+
+# Build outputs / dependencies
+dist/
+build/
+coverage/
+node_modules/
+vendor/
+
+# Local tooling and cache
+.go/
+.go-cache/
+
+# Docker files handled explicitly
+Dockerfile*
+docker-compose.yml

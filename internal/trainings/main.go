@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	"github.com/vaintrub/go-ddd-template/internal/common/logs"
 	"github.com/vaintrub/go-ddd-template/internal/common/server"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/ports"
@@ -12,14 +13,15 @@ import (
 )
 
 func main() {
-	logs.Init()
-
 	ctx := context.Background()
 
-	app, cleanup := service.NewApplication(ctx)
+	cfg := config.MustLoad(ctx)
+	logger := logs.Init(cfg.Logging)
+
+	app, cleanup := service.NewApplication(ctx, cfg)
 	defer cleanup()
 
-	server.RunHTTPServer(func(router chi.Router) http.Handler {
+	server.RunHTTPServer(cfg.Server, logger, func(router chi.Router) http.Handler {
 		return ports.HandlerFromMux(ports.NewHttpServer(app), router)
 	})
 }
