@@ -3,12 +3,11 @@ package decorator
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
-
-	"github.com/sirupsen/logrus"
 )
 
-func ApplyCommandDecorators[H any](handler CommandHandler[H], logger *logrus.Entry, metricsClient MetricsClient) CommandHandler[H] {
+func ApplyCommandDecorators[H any](handler CommandHandler[H], logger *slog.Logger, metricsClient MetricsClient) CommandHandler[H] {
 	return commandLoggingDecorator[H]{
 		base: commandMetricsDecorator[H]{
 			base:   handler,

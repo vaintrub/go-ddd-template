@@ -1,6 +1,8 @@
 package server
 
 import (
+	"context"
+	"log/slog"
 	"net/http"
 	"os"
 	"strconv"
@@ -10,7 +12,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/sirupsen/logrus"
 	"github.com/vaintrub/go-ddd-template/internal/common/auth"
 	"github.com/vaintrub/go-ddd-template/internal/common/logs"
 )
@@ -20,14 +21,18 @@ func RunHTTPServer(createHandler func(router chi.Router) http.Handler) {
 }
 
 func RunHTTPServerOnAddr(addr string, createHandler func(router chi.Router) http.Handler) {
+	// Initialize slog logger before starting server
+	logger := logs.Init()
+
 	apiRouter := chi.NewRouter()
-	setMiddlewares(apiRouter)
+	setMiddlewares(apiRouter, logger)
 
 	rootRouter := chi.NewRouter()
 	// we are mounting all APIs under /api path
 	rootRouter.Mount("/api", createHandler(apiRouter))
 
-	logrus.Info("Starting HTTP server")
+	ctx := context.Background()
+	slog.InfoContext(ctx, "Starting HTTP server", slog.String("addr", addr))
 
 	server := &http.Server{
 		Addr:         addr,
@@ -39,14 +44,15 @@ func RunHTTPServerOnAddr(addr string, createHandler func(router chi.Router) http
 
 	err := server.ListenAndServe()
 	if err != nil {
-		logrus.WithError(err).Panic("Unable to start HTTP server")
+		slog.ErrorContext(ctx, "Unable to start HTTP server", slog.Any("error", err))
+		panic(err)
 	}
 }
 
-func setMiddlewares(router *chi.Mux) {
+func setMiddlewares(router *chi.Mux, logger *slog.Logger) {
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
-	router.Use(logs.NewStructuredLogger(logrus.StandardLogger()))
+	router.Use(logs.HTTPLogger(logger))
 	router.Use(middleware.Recoverer)
 
 	addCorsMiddleware(router)

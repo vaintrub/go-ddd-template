@@ -19,6 +19,7 @@ vendor/
 # Tools
 .idea
 .claude
+.codex
 .specify
 
 .terraform

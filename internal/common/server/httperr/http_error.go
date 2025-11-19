@@ -1,11 +1,11 @@
 package httperr
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/go-chi/render"
 	"github.com/vaintrub/go-ddd-template/internal/common/errors"
-	"github.com/vaintrub/go-ddd-template/internal/common/logs"
 )
 
 func InternalError(slug string, err error, w http.ResponseWriter, r *http.Request) {
@@ -38,7 +38,11 @@ func RespondWithSlugError(err error, w http.ResponseWriter, r *http.Request) {
 }
 
 func httpRespondWithError(err error, slug string, w http.ResponseWriter, r *http.Request, logMSg string, status int) {
-	logs.GetLogEntry(r).WithError(err).WithField("error-slug", slug).Warn(logMSg)
+	// Use slog for error logging with context
+	slog.WarnContext(r.Context(), logMSg,
+		slog.Any("error", err),
+		slog.String("error-slug", slug),
+	)
 	resp := ErrorResponse{slug, status}
 
 	if err := render.Render(w, r, resp); err != nil {

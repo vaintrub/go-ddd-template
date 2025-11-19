@@ -5,9 +5,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"log/slog"
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
-	"github.com/vaintrub/go-ddd-template/internal/common/logs"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
@@ -33,7 +32,7 @@ func NewScheduleTrainingHandler(
 	repo training.Repository,
 	userService UserService,
 	trainerService TrainerService,
-	logger *logrus.Entry,
+	logger *slog.Logger,
 	metricsClient decorator.MetricsClient,
 ) ScheduleTrainingHandler {
 	if repo == nil {
@@ -54,10 +53,6 @@ func NewScheduleTrainingHandler(
 }
 
 func (h scheduleTrainingHandler) Handle(ctx context.Context, cmd ScheduleTraining) (err error) {
-	defer func() {
-		logs.LogCommandExecution("ScheduleTraining", cmd, err)
-	}()
-
 	tr, err := training.NewTraining(cmd.TrainingUUID, cmd.UserUUID, cmd.UserName, cmd.TrainingTime)
 	if err != nil {
 		return err

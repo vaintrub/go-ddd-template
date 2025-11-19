@@ -4,9 +4,8 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"log/slog"
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
-	"github.com/vaintrub/go-ddd-template/internal/common/logs"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
@@ -27,7 +26,7 @@ func NewCancelTrainingHandler(
 	repo training.Repository,
 	userService UserService,
 	trainerService TrainerService,
-	logger *logrus.Entry,
+	logger *slog.Logger,
 	metricsClient decorator.MetricsClient,
 ) decorator.CommandHandler[CancelTraining] {
 	if repo == nil {
@@ -48,10 +47,6 @@ func NewCancelTrainingHandler(
 }
 
 func (h cancelTrainingHandler) Handle(ctx context.Context, cmd CancelTraining) (err error) {
-	defer func() {
-		logs.LogCommandExecution("CancelTrainingHandler", cmd, err)
-	}()
-
 	return h.repo.UpdateTraining(
 		ctx,
 		cmd.TrainingUUID,

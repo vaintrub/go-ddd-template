@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"log/slog"
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
 	"github.com/vaintrub/go-ddd-template/internal/common/errors"
 )
@@ -26,7 +26,7 @@ type availableHoursHandler struct {
 
 func NewAvailableHoursHandler(
 	readModel AvailableHoursReadModel,
-	logger *logrus.Entry,
+	logger *slog.Logger,
 	metricsClient decorator.MetricsClient,
 ) AvailableHoursHandler {
 	return decorator.ApplyQueryDecorators[AvailableHours, []Date](
