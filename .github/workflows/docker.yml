@@ -1,0 +1,65 @@
+# Docker Workflow Contract - Container Image Build and Push
+# This file serves as the contract/schema for .github/workflows/docker.yml
+# IMPORTANT: This workflow should be created in FULLY COMMENTED OUT state
+# To activate: uncomment all lines and configure AWS secrets
+
+# name: Docker Build and Push
+#
+# on:
+#   release:
+#     types: [published]
+#
+# env:
+#   REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+#   IMAGE_NAME: ${{ secrets.ECR_REPOSITORY }}
+#
+# permissions:
+#   contents: read
+#
+# jobs:
+#   build-and-push:
+#     name: Build and Push Docker Image
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 15
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+#
+#       - name: Setup Docker Buildx
+#         uses: docker/setup-buildx-action@v3
+#
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ secrets.AWS_REGION }}
+#
+#       - name: Login to Amazon ECR
+#         uses: aws-actions/amazon-ecr-login@v2
+#
+#       - name: Extract metadata (tags, labels)
+#         id: meta
+#         uses: docker/metadata-action@v5
+#         with:
+#           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+#           tags: |
+#             type=semver,pattern={{version}}
+#             type=semver,pattern={{major}}.{{minor}}
+#             type=semver,pattern={{major}}
+#             type=raw,value=latest
+#
+#       - name: Build and push Docker image
+#         uses: docker/build-push-action@v5
+#         with:
+#           context: .
+#           file: ./Dockerfile
+#           push: true
+#           tags: ${{ steps.meta.outputs.tags }}
+#           labels: ${{ steps.meta.outputs.labels }}
+#           platforms: linux/amd64
+#           cache-from: type=gha
+#           cache-to: type=gha,mode=max
+#
+#       - name: Image digest
+#         run: echo "Image pushed with digest ${{ steps.build.outputs.digest }}"
