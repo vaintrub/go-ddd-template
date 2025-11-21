@@ -2,11 +2,12 @@ package command
 
 import (
 	"context"
+	"fmt"
 
 	"log/slog"
 
-	"github.com/pkg/errors"
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
+	"github.com/vaintrub/go-ddd-template/internal/common/errors"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
@@ -54,18 +55,18 @@ func (h cancelTrainingHandler) Handle(ctx context.Context, cmd CancelTraining) (
 		cmd.User,
 		func(ctx context.Context, tr *training.Training) (*training.Training, error) {
 			if err := tr.Cancel(); err != nil {
-				return nil, err
+				return nil, errors.NewIncorrectInputError(err.Error(), "cancel-training-failed")
 			}
 
 			if balanceDelta := training.CancelBalanceDelta(*tr, cmd.User.Type()); balanceDelta != 0 {
 				err := h.userService.UpdateTrainingBalance(ctx, tr.UserUUID(), balanceDelta)
 				if err != nil {
-					return nil, errors.Wrap(err, "unable to change trainings balance")
+					return nil, errors.NewSlugError(fmt.Sprintf("unable to change trainings balance: %s", err.Error()), "update-balance-failed")
 				}
 			}
 
 			if err := h.trainerService.CancelTraining(ctx, tr.Time()); err != nil {
-				return nil, errors.Wrap(err, "unable to cancel training")
+				return nil, errors.NewSlugError(fmt.Sprintf("unable to cancel training: %s", err.Error()), "cancel-training-failed")
 			}
 
 			return tr, nil

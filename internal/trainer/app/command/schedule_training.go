@@ -40,11 +40,11 @@ func NewScheduleTrainingHandler(
 func (h scheduleTrainingHandler) Handle(ctx context.Context, cmd ScheduleTraining) error {
 	if err := h.hourRepo.UpdateHour(ctx, cmd.Hour, func(h *hour.Hour) (*hour.Hour, error) {
 		if err := h.ScheduleTraining(); err != nil {
-			return nil, err
+			return nil, errors.NewIncorrectInputError(err.Error(), "schedule-training-failed")
 		}
 		return h, nil
 	}); err != nil {
-		return errors.NewSlugError(err.Error(), "unable-to-update-availability")
+		return errors.NewIncorrectInputError(err.Error(), "schedule-training-failed")
 	}
 
 	return nil

@@ -1,10 +1,9 @@
 package training
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 func (t Training) MovedProposedBy() UserType {
@@ -28,10 +27,9 @@ func (c CantRescheduleBeforeTimeError) Error() string {
 
 func (t *Training) RescheduleTraining(newTime time.Time) error {
 	if !t.CanBeCanceledForFree() {
-		err := CantRescheduleBeforeTimeError{
+		return CantRescheduleBeforeTimeError{
 			TrainingTime: t.Time(),
 		}
-		return errors.WithStack(err)
 	}
 
 	t.time = newTime
@@ -50,16 +48,15 @@ func (t *Training) IsRescheduleProposed() bool {
 
 var ErrNoRescheduleRequested = errors.New("no training reschedule was requested yet")
 
+var ErrSameUserTypeApproval = errors.New("cannot approve reschedule by the same user type that proposed it")
+
 func (t *Training) ApproveReschedule(userType UserType) error {
 	if !t.IsRescheduleProposed() {
-		return errors.WithStack(ErrNoRescheduleRequested)
+		return ErrNoRescheduleRequested
 	}
 
 	if t.moveProposedBy == userType {
-		return errors.Errorf(
-			"trying to approve reschedule by the same user type which proposed reschedule (%s)",
-			userType.String(),
-		)
+		return fmt.Errorf("%w: %s", ErrSameUserTypeApproval, userType.String())
 	}
 
 	t.time = t.proposedNewTime
@@ -72,7 +69,7 @@ func (t *Training) ApproveReschedule(userType UserType) error {
 
 func (t *Training) RejectReschedule() error {
 	if !t.IsRescheduleProposed() {
-		return errors.WithStack(ErrNoRescheduleRequested)
+		return ErrNoRescheduleRequested
 	}
 
 	t.proposedNewTime = time.Time{}

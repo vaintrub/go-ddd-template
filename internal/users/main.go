@@ -55,10 +55,7 @@ func main() {
 	cfg := config.MustLoad(ctx)
 	logger := logs.Init(cfg.Logging)
 
-	pool, err := commondb.NewPgxPool(ctx, cfg.Database, cfg.Env)
-	if err != nil {
-		panic(err)
-	}
+	pool := commondb.MustNewPgxPool(ctx, cfg.Database, cfg.Env)
 
 	// Use PostgreSQL repository instead of Firestore
 	userRepo := adapters.NewUserPostgresRepository(pool)

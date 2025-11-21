@@ -39,10 +39,7 @@ func NewComponentTestApplication(ctx context.Context, cfg config.Config) app.App
 }
 
 func newApplication(ctx context.Context, cfg config.Config, trainerGrpc command.TrainerService, usersGrpc command.UserService) app.Application {
-	pool, err := db.NewPgxPool(ctx, cfg.Database, cfg.Env)
-	if err != nil {
-		panic(err)
-	}
+	pool := db.MustNewPgxPool(ctx, cfg.Database, cfg.Env)
 
 	// Use PostgreSQL repository instead of Firestore
 	trainingsRepository := adapters.NewTrainingPostgresRepository(pool)

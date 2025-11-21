@@ -1,35 +1,43 @@
-# Exclude unnecessary files from Docker build context
+# Git
 .git
 .gitignore
-.dockerignore
 
-# Repository metadata and tooling
-.claude
-.codex
-.specify
+# IDE
 .idea
-
-# Environment and secrets
-.env
-.env.*
-*.env
-
-# Logs and temporary artifacts
-*.log
-*.tmp
+.vscode
 *.swp
+*.swo
+*~
 
-# Build outputs / dependencies
-dist/
-build/
-coverage/
-node_modules/
-vendor/
+# Build artifacts
+.go
+.go-cache
+*.exe
+*.test
+trainer
+trainings
+users
 
-# Local tooling and cache
-.go/
-.go-cache/
+# Environment
+.env
+.env.local
+.env.*.local
 
-# Docker files handled explicitly
+# Documentation
+docs
+*.md
+!README.md
+
+# Specs and tests
+specs
+*_test.go
+
+# Docker
+docker-compose*.yml
 Dockerfile*
-docker-compose.yml
+
+# Misc
+.DS_Store
+tmp
+temp
+*.log

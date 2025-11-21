@@ -18,7 +18,8 @@ WHERE id = $1;
 
 -- name: GetHourByTime :one
 SELECT * FROM trainer_hours
-WHERE hour_time = $1;
+WHERE hour_time = $1
+FOR UPDATE;
 
 -- name: UpdateHourAvailability :exec
 UPDATE trainer_hours

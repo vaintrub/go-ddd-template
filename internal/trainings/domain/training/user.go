@@ -1,10 +1,8 @@
 package training
 
 import (
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
-	commonErrors "github.com/vaintrub/go-ddd-template/internal/common/errors"
 )
 
 // UserType is enum-like type.
@@ -26,6 +24,8 @@ var (
 	Attendee = UserType{"attendee"}
 )
 
+var ErrInvalidUserType = errors.New("invalid user type")
+
 func NewUserTypeFromString(userType string) (UserType, error) {
 	switch userType {
 	case "trainer":
@@ -34,10 +34,7 @@ func NewUserTypeFromString(userType string) (UserType, error) {
 		return Attendee, nil
 	}
 
-	return UserType{}, commonErrors.NewIncorrectInputError(
-		fmt.Sprintf("invalid '%s' role", userType),
-		"invalid-role",
-	)
+	return UserType{}, fmt.Errorf("%w: %s", ErrInvalidUserType, userType)
 }
 
 type User struct {

@@ -94,6 +94,7 @@ func (q *Queries) GetTraining(ctx context.Context, id pgtype.UUID) (TrainingsTra
 
 const listAllTrainings = `-- name: ListAllTrainings :many
 SELECT id, user_id, user_name, training_time, notes, proposed_new_time, move_proposed_by, canceled, created_at, updated_at FROM trainings_trainings
+WHERE canceled = false
 ORDER BY created_at DESC, id
 `
 
@@ -131,6 +132,7 @@ func (q *Queries) ListAllTrainings(ctx context.Context) ([]TrainingsTraining, er
 const listTrainingsByUser = `-- name: ListTrainingsByUser :many
 SELECT id, user_id, user_name, training_time, notes, proposed_new_time, move_proposed_by, canceled, created_at, updated_at FROM trainings_trainings
 WHERE user_id = $1
+  AND canceled = false
   AND (created_at > $2 OR $2 IS NULL)
   AND (id > $3 OR $3 IS NULL)
 ORDER BY created_at, id

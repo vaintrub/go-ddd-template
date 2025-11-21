@@ -71,6 +71,7 @@ func (q *Queries) GetHour(ctx context.Context, id pgtype.UUID) (TrainerHour, err
 const getHourByTime = `-- name: GetHourByTime :one
 SELECT id, hour_time, availability, created_at, updated_at FROM trainer_hours
 WHERE hour_time = $1
+FOR UPDATE
 `
 
 func (q *Queries) GetHourByTime(ctx context.Context, hourTime time.Time) (TrainerHour, error) {

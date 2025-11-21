@@ -2,12 +2,13 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"log/slog"
 
-	"github.com/pkg/errors"
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
+	"github.com/vaintrub/go-ddd-template/internal/common/errors"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
@@ -56,21 +57,21 @@ func NewScheduleTrainingHandler(
 func (h scheduleTrainingHandler) Handle(ctx context.Context, cmd ScheduleTraining) (err error) {
 	tr, err := training.NewTraining(cmd.TrainingUUID, cmd.UserUUID, cmd.UserName, cmd.TrainingTime)
 	if err != nil {
-		return err
+		return errors.NewIncorrectInputError(err.Error(), "invalid-training-data")
 	}
 
 	if err := h.repo.AddTraining(ctx, tr); err != nil {
-		return err
+		return errors.NewSlugError(fmt.Sprintf("unable to add training: %s", err.Error()), "add-training-failed")
 	}
 
 	err = h.userService.UpdateTrainingBalance(ctx, tr.UserUUID(), -1)
 	if err != nil {
-		return errors.Wrap(err, "unable to change trainings balance")
+		return errors.NewSlugError(fmt.Sprintf("unable to change trainings balance: %s", err.Error()), "update-balance-failed")
 	}
 
 	err = h.trainerService.ScheduleTraining(ctx, tr.Time())
 	if err != nil {
-		return errors.Wrap(err, "unable to schedule training")
+		return errors.NewSlugError(fmt.Sprintf("unable to schedule training: %s", err.Error()), "schedule-training-failed")
 	}
 
 	return nil

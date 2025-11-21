@@ -73,15 +73,57 @@ func (r *HourPostgresRepository) GetHour(ctx context.Context, hourTime time.Time
 
 // UpdateHour updates an hour using the provided update function.
 // This implements the hour.Repository interface.
+// Uses a transaction to prevent race conditions.
+// If the hour doesn't exist, creates a new NotAvailableHour first (upsert behavior).
 func (r *HourPostgresRepository) UpdateHour(
 	ctx context.Context,
 	hourTime time.Time,
 	updateFn func(h *hour.Hour) (*hour.Hour, error),
 ) error {
-	// Get current hour
-	currentHour, err := r.GetHour(ctx, hourTime)
+	// Begin transaction
+	tx, err := r.pool.Begin(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		_ = tx.Rollback(ctx) // Rollback is safe to call even after commit
+	}()
+
+	queries := sqlc_trainer.New(tx)
+
+	// Try to get current hour within transaction
+	dbHour, err := queries.GetHourByTime(ctx, hourTime)
+	if err != nil {
+		translatedErr := db.TranslatePgError(err)
+		// If hour doesn't exist, create a new NotAvailableHour
+		if db.IsNotFound(translatedErr) {
+			// Create new hour with NotAvailable state
+			newHour, createErr := r.factory.NewNotAvailableHour(hourTime)
+			if createErr != nil {
+				return fmt.Errorf("failed to create new hour: %w", createErr)
+			}
+
+			// Insert into database and get the created record
+			uid := db.UUIDToPgtype(uuid.New())
+
+			dbHour, err = queries.CreateHour(ctx, uid, hourTime, newHour.Availability().String())
+			if err != nil {
+				return db.TranslatePgError(err)
+			}
+		} else {
+			return translatedErr
+		}
+	}
+
+	// Convert to domain object
+	availability, err := hour.NewAvailabilityFromString(dbHour.Availability)
+	if err != nil {
+		return fmt.Errorf("invalid availability in database: %w", err)
+	}
+
+	currentHour, err := r.factory.UnmarshalHourFromDatabase(dbHour.HourTime, availability)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal hour from database: %w", err)
 	}
 
 	// Apply update function
@@ -90,19 +132,15 @@ func (r *HourPostgresRepository) UpdateHour(
 		return err
 	}
 
-	// Save updated hour back to database
-	queries := sqlc_trainer.New(r.pool)
-
-	// Find the hour record by time
-	dbHour, err := queries.GetHourByTime(ctx, hourTime)
+	// Update availability within transaction
+	err = queries.UpdateHourAvailability(ctx, dbHour.ID, updatedHour.Availability().String())
 	if err != nil {
 		return db.TranslatePgError(err)
 	}
 
-	// Update availability
-	err = queries.UpdateHourAvailability(ctx, dbHour.ID, updatedHour.Availability().String())
-	if err != nil {
-		return db.TranslatePgError(err)
+	// Commit transaction
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return nil
@@ -174,23 +212,46 @@ func (r *HourPostgresRepository) AvailableHours(ctx context.Context, from time.T
 		return nil, err
 	}
 
-	// Group hours by date and check if any are available
-	dateMap := make(map[string]bool)
+	// Group hours by date
+	dateMap := make(map[string]*query.Date)
 	for _, h := range hours {
 		dateStr := h.HourTime.Format("2006-01-02")
-		if h.Availability == "available" {
-			dateMap[dateStr] = true
+
+		// Get or create date entry
+		date, exists := dateMap[dateStr]
+		if !exists {
+			parsedDate, parseErr := time.Parse("2006-01-02", dateStr)
+			if parseErr != nil {
+				continue
+			}
+			date = &query.Date{
+				Date:         parsedDate,
+				HasFreeHours: false,
+				Hours:        []query.Hour{},
+			}
+			dateMap[dateStr] = date
+		}
+
+		// Add hour to date
+		isAvailable := h.Availability == "available"
+		hasTraining := h.Availability == "training_scheduled"
+
+		date.Hours = append(date.Hours, query.Hour{
+			Available:            isAvailable,
+			HasTrainingScheduled: hasTraining,
+			Hour:                 h.HourTime,
+		})
+
+		// Update HasFreeHours if this hour is available
+		if isAvailable {
+			date.HasFreeHours = true
 		}
 	}
 
-	// Convert to Date slice
+	// Convert map to slice
 	dates := make([]query.Date, 0, len(dateMap))
-	for dateStr := range dateMap {
-		t, err := time.Parse("2006-01-02", dateStr)
-		if err != nil {
-			continue
-		}
-		dates = append(dates, query.Date{Date: t})
+	for _, date := range dateMap {
+		dates = append(dates, *date)
 	}
 
 	return dates, nil

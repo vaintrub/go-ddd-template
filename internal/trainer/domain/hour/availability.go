@@ -1,6 +1,6 @@
 package hour
 
-import "github.com/pkg/errors"
+import "errors"
 
 var (
 	Available         = Availability{"available"}
@@ -29,7 +29,7 @@ func NewAvailabilityFromString(availabilityStr string) (Availability, error) {
 			return availability, nil
 		}
 	}
-	return Availability{}, errors.Errorf("unknown '%s' availability", availabilityStr)
+	return Availability{}, errors.New("unknown availability: " + availabilityStr)
 }
 
 // Every type in Go have zero value. In that case it's `Availability{}`.

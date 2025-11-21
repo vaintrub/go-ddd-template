@@ -69,6 +69,16 @@ func NewPgxPool(ctx context.Context, dbCfg config.DatabaseConfig, envCfg config.
 	return pool, nil
 }
 
+// MustNewPgxPool creates a new PostgreSQL connection pool and panics on error.
+// Use this for service initialization where failure should prevent startup.
+func MustNewPgxPool(ctx context.Context, dbCfg config.DatabaseConfig, envCfg config.EnvConfig) *pgxpool.Pool {
+	pool, err := NewPgxPool(ctx, dbCfg, envCfg)
+	if err != nil {
+		panic(fmt.Errorf("failed to create database connection pool: %w", err))
+	}
+	return pool
+}
+
 // Close gracefully closes the connection pool, waiting for connections to be released.
 func Close(pool *pgxpool.Pool) {
 	if pool != nil {

@@ -39,10 +39,18 @@ func RespondWithSlugError(err error, w http.ResponseWriter, r *http.Request) {
 
 func httpRespondWithError(err error, slug string, w http.ResponseWriter, r *http.Request, logMSg string, status int) {
 	// Use slog for error logging with context
-	slog.WarnContext(r.Context(), logMSg,
-		slog.Any("error", err),
-		slog.String("error-slug", slug),
-	)
+	// Log as ERROR for 5xx, WARN for 4xx
+	if status >= 500 {
+		slog.ErrorContext(r.Context(), logMSg,
+			slog.Any("error", err),
+			slog.String("error-slug", slug),
+		)
+	} else {
+		slog.WarnContext(r.Context(), logMSg,
+			slog.Any("error", err),
+			slog.String("error-slug", slug),
+		)
+	}
 	resp := ErrorResponse{slug, status}
 
 	if err := render.Render(w, r, resp); err != nil {

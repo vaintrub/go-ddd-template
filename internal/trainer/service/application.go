@@ -15,10 +15,7 @@ import (
 )
 
 func NewApplication(ctx context.Context, cfg config.Config) app.Application {
-	pool, err := db.NewPgxPool(ctx, cfg.Database, cfg.Env)
-	if err != nil {
-		panic(err)
-	}
+	pool := db.MustNewPgxPool(ctx, cfg.Database, cfg.Env)
 
 	factoryConfig := hour.FactoryConfig{
 		MaxWeeksInTheFutureToSet: 6,
@@ -26,10 +23,7 @@ func NewApplication(ctx context.Context, cfg config.Config) app.Application {
 		MaxUtcHour:               20,
 	}
 
-	hourFactory, err := hour.NewFactory(factoryConfig)
-	if err != nil {
-		panic(err)
-	}
+	hourFactory := hour.MustNewFactory(factoryConfig)
 
 	// Use PostgreSQL repository instead of Firestore
 	hourRepository := adapters.NewHourPostgresRepository(pool, hourFactory)

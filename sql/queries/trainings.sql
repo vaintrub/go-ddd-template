@@ -38,6 +38,7 @@ WHERE id = $1;
 -- name: ListTrainingsByUser :many
 SELECT * FROM trainings_trainings
 WHERE user_id = $1
+  AND canceled = false
   AND (created_at > $2 OR $2 IS NULL)
   AND (id > $3 OR $3 IS NULL)
 ORDER BY created_at, id
@@ -45,4 +46,5 @@ LIMIT $4;
 
 -- name: ListAllTrainings :many
 SELECT * FROM trainings_trainings
+WHERE canceled = false
 ORDER BY created_at DESC, id;

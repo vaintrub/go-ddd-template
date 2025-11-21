@@ -2,10 +2,12 @@ package command
 
 import (
 	"context"
+	"fmt"
 
 	"log/slog"
 
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
+	"github.com/vaintrub/go-ddd-template/internal/common/errors"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
@@ -55,12 +57,12 @@ func (h approveTrainingRescheduleHandler) Handle(ctx context.Context, cmd Approv
 			originalTrainingTime := tr.Time()
 
 			if err := tr.ApproveReschedule(cmd.User.Type()); err != nil {
-				return nil, err
+				return nil, errors.NewIncorrectInputError(err.Error(), "approve-reschedule-failed")
 			}
 
 			err := h.trainerService.MoveTraining(ctx, tr.Time(), originalTrainingTime)
 			if err != nil {
-				return nil, err
+				return nil, errors.NewSlugError(fmt.Sprintf("unable to move training: %s", err.Error()), "move-training-failed")
 			}
 
 			return tr, nil

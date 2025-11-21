@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
+	"github.com/vaintrub/go-ddd-template/internal/common/errors"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
@@ -48,7 +49,7 @@ func (h requestTrainingRescheduleHandler) Handle(ctx context.Context, cmd Reques
 		cmd.User,
 		func(ctx context.Context, tr *training.Training) (*training.Training, error) {
 			if err := tr.UpdateNotes(cmd.NewNotes); err != nil {
-				return nil, err
+				return nil, errors.NewIncorrectInputError(err.Error(), "update-notes-failed")
 			}
 
 			tr.ProposeReschedule(cmd.NewTime, cmd.User.Type())

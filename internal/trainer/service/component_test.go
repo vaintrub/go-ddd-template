@@ -28,11 +28,6 @@ func TestHoursAvailability(t *testing.T) {
 	client := tests.NewTrainerHTTPClient(t, token)
 
 	hour := tests.RelativeDate(11, 12)
-	expectedHour := trainerHTTP.Hour{
-		Available:            true,
-		HasTrainingScheduled: false,
-		Hour:                 hour,
-	}
 
 	date := hour.Truncate(24 * time.Hour)
 	from := date.AddDate(0, 0, -1)
@@ -49,15 +44,31 @@ func TestHoursAvailability(t *testing.T) {
 		return nil
 	}
 
+	findHour := func(hours []trainerHTTP.Hour, targetHour time.Time) *trainerHTTP.Hour {
+		for _, h := range hours {
+			// Compare using UTC to avoid timezone issues
+			if h.Hour.UTC().Equal(targetHour.UTC()) {
+				return &h
+			}
+		}
+		return nil
+	}
+
 	client.MakeHourUnavailable(t, hour)
-	require.NotContains(t, getHours(), expectedHour)
+	foundHour := findHour(getHours(), hour)
+	require.NotNil(t, foundHour, "hour should exist after making unavailable")
+	require.False(t, foundHour.Available, "hour should not be available")
 
 	code := client.MakeHourAvailable(t, hour)
 	require.Equal(t, http.StatusNoContent, code)
-	require.Contains(t, getHours(), expectedHour)
+	foundHour = findHour(getHours(), hour)
+	require.NotNil(t, foundHour, "hour should exist after making available")
+	require.True(t, foundHour.Available, "hour should be available")
 
 	client.MakeHourUnavailable(t, hour)
-	require.NotContains(t, getHours(), expectedHour)
+	foundHour = findHour(getHours(), hour)
+	require.NotNil(t, foundHour, "hour should exist after making unavailable again")
+	require.False(t, foundHour.Available, "hour should not be available")
 }
 
 func TestUnauthorizedForAttendee(t *testing.T) {

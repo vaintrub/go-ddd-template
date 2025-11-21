@@ -40,11 +40,11 @@ func NewCancelTrainingHandler(
 func (h cancelTrainingHandler) Handle(ctx context.Context, cmd CancelTraining) error {
 	if err := h.hourRepo.UpdateHour(ctx, cmd.Hour, func(h *hour.Hour) (*hour.Hour, error) {
 		if err := h.CancelTraining(); err != nil {
-			return nil, err
+			return nil, errors.NewIncorrectInputError(err.Error(), "cancel-training-failed")
 		}
 		return h, nil
 	}); err != nil {
-		return errors.NewSlugError(err.Error(), "unable-to-update-availability")
+		return errors.NewIncorrectInputError(err.Error(), "cancel-training-failed")
 	}
 
 	return nil

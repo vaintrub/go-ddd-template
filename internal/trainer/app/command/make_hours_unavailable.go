@@ -41,11 +41,11 @@ func (c makeHoursUnavailableHandler) Handle(ctx context.Context, cmd MakeHoursUn
 	for _, hourToUpdate := range cmd.Hours {
 		if err := c.hourRepo.UpdateHour(ctx, hourToUpdate, func(h *hour.Hour) (*hour.Hour, error) {
 			if err := h.MakeNotAvailable(); err != nil {
-				return nil, err
+				return nil, errors.NewIncorrectInputError(err.Error(), "make-hours-unavailable-failed")
 			}
 			return h, nil
 		}); err != nil {
-			return errors.NewSlugError(err.Error(), "unable-to-update-availability")
+			return errors.NewIncorrectInputError(err.Error(), "make-hours-unavailable-failed")
 		}
 	}
 

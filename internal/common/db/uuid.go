@@ -29,3 +29,13 @@ func StringToPgtypeUUID(s string) (pgtype.UUID, error) {
 	}
 	return UUIDToPgtype(u), nil
 }
+
+// MustParsePgtypeUUID converts a UUID string to pgtype.UUID and panics on error.
+// Use this only when you are certain the string is a valid UUID.
+func MustParsePgtypeUUID(s string) pgtype.UUID {
+	u, err := StringToPgtypeUUID(s)
+	if err != nil {
+		panic("invalid UUID: " + s + " - " + err.Error())
+	}
+	return u
+}

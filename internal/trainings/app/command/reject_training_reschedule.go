@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/vaintrub/go-ddd-template/internal/common/decorator"
+	"github.com/vaintrub/go-ddd-template/internal/common/errors"
 	"github.com/vaintrub/go-ddd-template/internal/trainings/domain/training"
 )
 
@@ -43,7 +44,7 @@ func (h rejectTrainingRescheduleHandler) Handle(ctx context.Context, cmd RejectT
 		cmd.User,
 		func(ctx context.Context, tr *training.Training) (*training.Training, error) {
 			if err := tr.RejectReschedule(); err != nil {
-				return nil, err
+				return nil, errors.NewIncorrectInputError(err.Error(), "reject-reschedule-failed")
 			}
 
 			return tr, nil

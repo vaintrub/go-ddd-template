@@ -1,10 +1,8 @@
 package training
 
 import (
+	"errors"
 	"time"
-
-	"github.com/pkg/errors"
-	commonerrors "github.com/vaintrub/go-ddd-template/internal/common/errors"
 )
 
 type Training struct {
@@ -87,11 +85,11 @@ func (t Training) Time() time.Time {
 	return t.time
 }
 
-var ErrNoteTooLong = commonerrors.NewIncorrectInputError("Note too long", "note-too-long")
+var ErrNoteTooLong = errors.New("note too long (max 1000 characters)")
 
 func (t *Training) UpdateNotes(notes string) error {
 	if len(notes) > 1000 {
-		return errors.WithStack(ErrNoteTooLong)
+		return ErrNoteTooLong
 	}
 
 	t.notes = notes

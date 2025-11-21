@@ -1,11 +1,9 @@
 package hour
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
-	"go.uber.org/multierr"
 )
 
 type Hour struct {
@@ -21,47 +19,20 @@ type FactoryConfig struct {
 }
 
 func (f FactoryConfig) Validate() error {
-	var err error
-
 	if f.MaxWeeksInTheFutureToSet < 1 {
-		err = multierr.Append(
-			err,
-			errors.Errorf(
-				"MaxWeeksInTheFutureToSet should be greater than 1, but is %d",
-				f.MaxWeeksInTheFutureToSet,
-			),
-		)
+		return fmt.Errorf("MaxWeeksInTheFutureToSet should be greater than 1, but is %d", f.MaxWeeksInTheFutureToSet)
 	}
 	if f.MinUtcHour < 0 || f.MinUtcHour > 24 {
-		err = multierr.Append(
-			err,
-			errors.Errorf(
-				"MinUtcHour should be value between 0 and 24, but is %d",
-				f.MinUtcHour,
-			),
-		)
+		return fmt.Errorf("MinUtcHour should be value between 0 and 24, but is %d", f.MinUtcHour)
 	}
 	if f.MaxUtcHour < 0 || f.MaxUtcHour > 24 {
-		err = multierr.Append(
-			err,
-			errors.Errorf(
-				"MinUtcHour should be value between 0 and 24, but is %d",
-				f.MaxUtcHour,
-			),
-		)
+		return fmt.Errorf("MaxUtcHour should be value between 0 and 24, but is %d", f.MaxUtcHour)
 	}
-
 	if f.MinUtcHour > f.MaxUtcHour {
-		err = multierr.Append(
-			err,
-			errors.Errorf(
-				"MinUtcHour (%d) can't be after MaxUtcHour (%d)",
-				f.MinUtcHour, f.MaxUtcHour,
-			),
-		)
+		return fmt.Errorf("MinUtcHour (%d) can't be after MaxUtcHour (%d)", f.MinUtcHour, f.MaxUtcHour)
 	}
 
-	return err
+	return nil
 }
 
 type Factory struct {
@@ -72,7 +43,7 @@ type Factory struct {
 
 func NewFactory(fc FactoryConfig) (Factory, error) {
 	if err := fc.Validate(); err != nil {
-		return Factory{}, errors.Wrap(err, "invalid config passed to factory")
+		return Factory{}, fmt.Errorf("invalid config passed to factory: %w", err)
 	}
 
 	return Factory{fc: fc}, nil
