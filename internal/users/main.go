@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
+	casdoorauth "github.com/vaintrub/go-ddd-template/internal/common/auth/casdoor"
 	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	commondb "github.com/vaintrub/go-ddd-template/internal/common/db"
 	"github.com/vaintrub/go-ddd-template/internal/common/genproto/users"
@@ -64,6 +65,11 @@ func main() {
 	userRepo := adapters.NewUserPostgresRepository(pool)
 	postgresDB := &postgresDB{repo: userRepo}
 
+	casdoorSvc, err := casdoorauth.NewServiceFromConfig(cfg.Auth.Casdoor)
+	if err != nil {
+		panic(err)
+	}
+
 	serverType := strings.ToLower(os.Getenv("SERVER_TO_RUN"))
 	switch serverType {
 	case "http":
@@ -71,7 +77,7 @@ func main() {
 		// go loadFixtures()
 
 		server.RunHTTPServer(cfg.Server, logger, func(router chi.Router) http.Handler {
-			return HandlerFromMux(HttpServer{postgresDB}, router)
+			return HandlerFromMux(HttpServer{db: postgresDB, casdoor: casdoorSvc}, router)
 		})
 	case "grpc":
 		server.RunGRPCServer(cfg.Server, logger, func(server *grpc.Server) {

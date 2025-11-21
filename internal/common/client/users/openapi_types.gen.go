@@ -7,9 +7,42 @@ const (
 	BearerAuthScopes = "bearerAuth.Scopes"
 )
 
+// CasdoorOAuthResponse defines model for CasdoorOAuthResponse.
+type CasdoorOAuthResponse struct {
+	AccessToken string `json:"accessToken"`
+
+	// ExpiresIn Token TTL in seconds
+	ExpiresIn    int         `json:"expiresIn"`
+	RefreshToken *string     `json:"refreshToken,omitempty"`
+	TokenType    string      `json:"tokenType"`
+	User         CasdoorUser `json:"user"`
+}
+
+// CasdoorUser defines model for CasdoorUser.
+type CasdoorUser struct {
+	Avatar      *string `json:"avatar,omitempty"`
+	DisplayName *string `json:"displayName,omitempty"`
+	Email       *string `json:"email,omitempty"`
+	Id          *string `json:"id,omitempty"`
+	Name        string  `json:"name"`
+	Owner       *string `json:"owner,omitempty"`
+}
+
+// Error defines model for Error.
+type Error struct {
+	Message string `json:"message"`
+	Slug    string `json:"slug"`
+}
+
 // User defines model for User.
 type User struct {
 	Balance     int    `json:"balance"`
 	DisplayName string `json:"displayName"`
 	Role        string `json:"role"`
+}
+
+// CasdoorCallbackParams defines parameters for CasdoorCallback.
+type CasdoorCallbackParams struct {
+	Code  string `form:"code" json:"code"`
+	State string `form:"state" json:"state"`
 }

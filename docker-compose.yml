@@ -1,5 +1,4 @@
 services:
-
   trainer-http:
     build:
       context: docker/app
@@ -7,7 +6,6 @@ services:
       - ./internal:/internal
       - ./.go/pkg:/go/pkg
       - ./.go-cache:/go-cache
-#      - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
     working_dir: /internal
     ports:
       - "127.0.0.1:3000:$PORT"
@@ -18,7 +16,8 @@ services:
       SERVER_TO_RUN: http
       GOCACHE: /go-cache
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   trainer-grpc:
     build:
@@ -27,7 +26,6 @@ services:
       - ./internal:/internal
       - ./.go/pkg:/go/pkg
       - ./.go-cache:/go-cache
-#      - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
     working_dir: /internal
     ports:
       - "127.0.0.1:3010:$PORT"
@@ -47,7 +45,6 @@ services:
       - ./internal:/internal
       - ./.go/pkg:/go/pkg
       - ./.go-cache:/go-cache
-#      - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
     working_dir: /internal
     ports:
       - "127.0.0.1:3001:$PORT"
@@ -56,8 +53,11 @@ services:
     environment:
       SERVICE: trainings
       GOCACHE: /go-cache
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   users-http:
     build:
@@ -66,7 +66,6 @@ services:
       - ./internal:/internal
       - ./.go/pkg:/go/pkg
       - ./.go-cache:/go-cache
-#      - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
     working_dir: /internal
     ports:
       - "127.0.0.1:3002:$PORT"
@@ -77,7 +76,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   users-grpc:
     build:
@@ -86,7 +86,6 @@ services:
       - ./internal:/internal
       - ./.go/pkg:/go/pkg
       - ./.go-cache:/go-cache
-#      - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
     working_dir: /internal
     ports:
       - "127.0.0.1:3020:$PORT"
@@ -97,7 +96,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres:14-alpine
@@ -110,6 +110,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
 
 volumes:
   postgres_data:

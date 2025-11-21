@@ -103,15 +103,26 @@ func startService(t *testing.T) bool {
 }
 
 func TestMain(m *testing.M) {
+	ctx := context.Background()
+	dbURL, terminate, err := tests.StartPostgresContainer(ctx)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Skipping trainer service tests: %v\n", err)
+		os.Exit(0)
+	}
+	os.Setenv("DATABASE_URL", dbURL)
+
 	// Create a dummy testing.T for logging in setup
 	// In TestMain we can't use t.Log, so we use fmt.Fprintf to stderr
 	dummyT := &testing.T{}
 	if !startService(dummyT) {
 		fmt.Fprintln(os.Stderr, "Timed out waiting for services to come up")
+		_ = terminate(context.Background())
 		os.Exit(1)
 	}
 
-	os.Exit(m.Run())
+	code := m.Run()
+	_ = terminate(context.Background())
+	os.Exit(code)
 }
 
 func componentTestConfig() config.Config {

@@ -122,6 +122,7 @@ func setDefaults(v *viper.Viper, cfg Config) {
 	v.SetDefault("server.idle_timeout", cfg.Server.IdleTimeout)
 	v.SetDefault("server.mock_auth", cfg.Server.MockAuth)
 	v.SetDefault("server.cors_allowed_origins", cfg.Server.CORSAllowedOrigins)
+	v.SetDefault("server.public_auth_skip_paths", cfg.Server.PublicAuthSkipPaths)
 
 	v.SetDefault("logging.level", cfg.Logging.Level)
 	v.SetDefault("logging.add_source", cfg.Logging.AddSource)
@@ -139,6 +140,13 @@ func setDefaults(v *viper.Viper, cfg Config) {
 	v.SetDefault("grpc.dial_timeout", cfg.GRPC.DialTimeout)
 
 	v.SetDefault("auth.mock", cfg.Auth.Mock)
+	v.SetDefault("auth.casdoor.enabled", cfg.Auth.Casdoor.Enabled)
+	v.SetDefault("auth.casdoor.endpoint", cfg.Auth.Casdoor.Endpoint)
+	v.SetDefault("auth.casdoor.client_id", cfg.Auth.Casdoor.ClientID)
+	v.SetDefault("auth.casdoor.client_secret", cfg.Auth.Casdoor.ClientSecret)
+	v.SetDefault("auth.casdoor.certificate", cfg.Auth.Casdoor.Certificate)
+	v.SetDefault("auth.casdoor.organization", cfg.Auth.Casdoor.Organization)
+	v.SetDefault("auth.casdoor.application", cfg.Auth.Casdoor.Application)
 
 	v.SetDefault("contexts.trainings.feature_flags", cfg.Contexts.Trainings.FeatureFlags)
 	v.SetDefault("contexts.trainings.metrics_namespace", cfg.Contexts.Trainings.MetricsNamespace)
@@ -154,6 +162,7 @@ func bindLegacyEnvVars(v *viper.Viper) {
 	_ = v.BindEnv("server.port", "SERVER_PORT", "PORT")
 	_ = v.BindEnv("server.mock_auth", "SERVER_MOCK_AUTH", "MOCK_AUTH")
 	_ = v.BindEnv("server.cors_allowed_origins", "SERVER_CORS_ALLOWED_ORIGINS", "CORS_ALLOWED_ORIGINS")
+	_ = v.BindEnv("server.public_auth_skip_paths", "SERVER_PUBLIC_AUTH_SKIP_PATHS")
 	_ = v.BindEnv("server.read_timeout", "SERVER_READ_TIMEOUT")
 	_ = v.BindEnv("server.write_timeout", "SERVER_WRITE_TIMEOUT")
 	_ = v.BindEnv("server.idle_timeout", "SERVER_IDLE_TIMEOUT")
@@ -174,4 +183,11 @@ func bindLegacyEnvVars(v *viper.Viper) {
 	_ = v.BindEnv("grpc.dial_timeout", "GRPC_DIAL_TIMEOUT")
 
 	_ = v.BindEnv("auth.mock", "AUTH_MOCK", "MOCK_AUTH")
+	_ = v.BindEnv("auth.casdoor.enabled", "CASDOOR_ENABLED")
+	_ = v.BindEnv("auth.casdoor.endpoint", "CASDOOR_ENDPOINT")
+	_ = v.BindEnv("auth.casdoor.client_id", "CASDOOR_CLIENT_ID")
+	_ = v.BindEnv("auth.casdoor.client_secret", "CASDOOR_CLIENT_SECRET")
+	_ = v.BindEnv("auth.casdoor.certificate", "CASDOOR_CERTIFICATE")
+	_ = v.BindEnv("auth.casdoor.organization", "CASDOOR_ORG_SLUG", "CASDOOR_ORGANIZATION")
+	_ = v.BindEnv("auth.casdoor.application", "CASDOOR_APPLICATION_NAME")
 }
