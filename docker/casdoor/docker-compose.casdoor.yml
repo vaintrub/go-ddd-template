@@ -1,0 +1,44 @@
+services:
+  casdoor:
+    image: casbin/casdoor-all-in-one:latest
+    container_name: casdoor-all-in-one
+    platform: linux/amd64
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${CASDOOR_PORT}:8000"
+    environment:
+      GIN_MODE: release
+      CASDOOR_DEFAULT_ORG: ${CASDOOR_ORG_SLUG}
+      CASDOOR_DEFAULT_APP: ${CASDOOR_APPLICATION_NAME}
+      CASDOOR_ADMIN_USERNAME: ${CASDOOR_ADMIN_USERNAME}
+      CASDOOR_ADMIN_PASSWORD: ${CASDOOR_ADMIN_PASSWORD}
+      CASDOOR_CLIENT_ID: ${CASDOOR_CLIENT_ID}
+      CASDOOR_CLIENT_SECRET: ${CASDOOR_CLIENT_SECRET}
+      CASDOOR_CALLBACK_URL: ${CASDOOR_CALLBACK_URL}
+    volumes:
+      - casdoor-mariadb:/var/lib/mysql
+      - ../..//docker/casdoor/init/data.json:/init_data.json:ro
+
+  casdoor-init:
+    image: golang:1.25
+    container_name: casdoor-init
+    depends_on:
+      casdoor:
+        condition: service_started
+    environment:
+      CASDOOR_ENDPOINT: http://casdoor:8000
+      CASDOOR_ORG_SLUG: ${CASDOOR_ORG_SLUG}
+      CASDOOR_APPLICATION_NAME: ${CASDOOR_APPLICATION_NAME}
+      CASDOOR_CLIENT_ID: ${CASDOOR_CLIENT_ID}
+      CASDOOR_CLIENT_SECRET: ${CASDOOR_CLIENT_SECRET}
+      CASDOOR_CALLBACK_URL: ${CASDOOR_CALLBACK_URL}
+      CASDOOR_CERTIFICATE_NAME: ${CASDOOR_CERTIFICATE_NAME:-}
+    volumes:
+      - ../..:/workspace
+      - ${HOME}/go:/go
+    working_dir: /workspace
+    command: ["go", "run", "./docker/casdoor/init"]
+    restart: "no"
+
+volumes:
+  casdoor-mariadb:

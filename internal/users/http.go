@@ -1,16 +1,19 @@
 package main
 
 import (
+	"errors"
 	"net"
 	"net/http"
 
 	"github.com/go-chi/render"
 	"github.com/vaintrub/go-ddd-template/internal/common/auth"
+	casdoorauth "github.com/vaintrub/go-ddd-template/internal/common/auth/casdoor"
 	"github.com/vaintrub/go-ddd-template/internal/common/server/httperr"
 )
 
 type HttpServer struct {
-	db db
+	db      db
+	casdoor *casdoorauth.Service
 }
 
 func (h HttpServer) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
@@ -42,4 +45,47 @@ func (h HttpServer) GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Respond(w, r, userResponse)
+}
+
+func (h HttpServer) CasdoorCallback(w http.ResponseWriter, r *http.Request, params CasdoorCallbackParams) {
+	if h.casdoor == nil {
+		httperr.BadRequest("casdoor-not-configured", errors.New("casdoor integration is disabled"), w, r)
+		return
+	}
+
+	callbackResult, err := h.casdoor.HandleCallback(params.Code, params.State)
+	if err != nil {
+		httperr.InternalError("casdoor-callback-failed", err, w, r)
+		return
+	}
+
+	response := CasdoorOAuthResponse{
+		AccessToken: callbackResult.AccessToken,
+		TokenType:   callbackResult.TokenType,
+		ExpiresIn:   callbackResult.ExpiresIn,
+		User: CasdoorUser{
+			Name: callbackResult.User.Name,
+		},
+	}
+
+	if callbackResult.RefreshToken != nil {
+		response.RefreshToken = callbackResult.RefreshToken
+	}
+	if callbackResult.User.Owner != nil {
+		response.User.Owner = callbackResult.User.Owner
+	}
+	if callbackResult.User.DisplayName != nil {
+		response.User.DisplayName = callbackResult.User.DisplayName
+	}
+	if callbackResult.User.Email != nil {
+		response.User.Email = callbackResult.User.Email
+	}
+	if callbackResult.User.Avatar != nil {
+		response.User.Avatar = callbackResult.User.Avatar
+	}
+	if callbackResult.User.Id != nil {
+		response.User.Id = callbackResult.User.Id
+	}
+
+	render.Respond(w, r, response)
 }

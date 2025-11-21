@@ -26,6 +26,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
 
+  /auth/casdoor/callback:
+    get:
+      operationId: casdoorCallback
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: state
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OAuth tokens and user profile from Casdoor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CasdoorOAuthResponse'
+        '400':
+          description: Missing or invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Unexpected error during token exchange
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -47,6 +81,43 @@ components:
         role:
           type: string
 
+    CasdoorOAuthResponse:
+      type: object
+      required:
+        - accessToken
+        - tokenType
+        - expiresIn
+        - user
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenType:
+          type: string
+        expiresIn:
+          type: integer
+          description: Token TTL in seconds
+        user:
+          $ref: '#/components/schemas/CasdoorUser'
+
+    CasdoorUser:
+      type: object
+      required:
+        - name
+      properties:
+        owner:
+          type: string
+        name:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+        avatar:
+          type: string
+        id:
+          type: string
     Error:
       type: object
       required:

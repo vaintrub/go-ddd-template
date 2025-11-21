@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/oapi-codegen/runtime"
 )
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
@@ -86,8 +88,23 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// CasdoorCallback request
+	CasdoorCallback(ctx context.Context, params *CasdoorCallbackParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetCurrentUser request
 	GetCurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) CasdoorCallback(ctx context.Context, params *CasdoorCallbackParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCasdoorCallbackRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) GetCurrentUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -100,6 +117,63 @@ func (c *Client) GetCurrentUser(ctx context.Context, reqEditors ...RequestEditor
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewCasdoorCallbackRequest generates requests for CasdoorCallback
+func NewCasdoorCallbackRequest(server string, params *CasdoorCallbackParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/casdoor/callback")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "code", runtime.ParamLocationQuery, params.Code); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "state", runtime.ParamLocationQuery, params.State); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewGetCurrentUserRequest generates requests for GetCurrentUser
@@ -172,8 +246,35 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// CasdoorCallbackWithResponse request
+	CasdoorCallbackWithResponse(ctx context.Context, params *CasdoorCallbackParams, reqEditors ...RequestEditorFn) (*CasdoorCallbackResponse, error)
+
 	// GetCurrentUserWithResponse request
 	GetCurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCurrentUserResponse, error)
+}
+
+type CasdoorCallbackResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *CasdoorOAuthResponse
+	JSON400      *Error
+	JSON500      *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CasdoorCallbackResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CasdoorCallbackResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type GetCurrentUserResponse struct {
@@ -198,6 +299,15 @@ func (r GetCurrentUserResponse) StatusCode() int {
 	return 0
 }
 
+// CasdoorCallbackWithResponse request returning *CasdoorCallbackResponse
+func (c *ClientWithResponses) CasdoorCallbackWithResponse(ctx context.Context, params *CasdoorCallbackParams, reqEditors ...RequestEditorFn) (*CasdoorCallbackResponse, error) {
+	rsp, err := c.CasdoorCallback(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCasdoorCallbackResponse(rsp)
+}
+
 // GetCurrentUserWithResponse request returning *GetCurrentUserResponse
 func (c *ClientWithResponses) GetCurrentUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetCurrentUserResponse, error) {
 	rsp, err := c.GetCurrentUser(ctx, reqEditors...)
@@ -205,6 +315,46 @@ func (c *ClientWithResponses) GetCurrentUserWithResponse(ctx context.Context, re
 		return nil, err
 	}
 	return ParseGetCurrentUserResponse(rsp)
+}
+
+// ParseCasdoorCallbackResponse parses an HTTP response from a CasdoorCallbackWithResponse call
+func ParseCasdoorCallbackResponse(rsp *http.Response) (*CasdoorCallbackResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CasdoorCallbackResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CasdoorOAuthResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseGetCurrentUserResponse parses an HTTP response from a GetCurrentUserWithResponse call
