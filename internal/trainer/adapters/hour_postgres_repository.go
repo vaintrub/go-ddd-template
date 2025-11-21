@@ -93,7 +93,7 @@ func (r *HourPostgresRepository) UpdateHour(
 
 	// Try to get current hour within transaction
 	dbHour, err := queries.GetHourByTime(ctx, hourTime)
-	if err != nil {
+	if err != nil { //nolint:nestif // Transaction logic requires nested error handling
 		translatedErr := db.TranslatePgError(err)
 		// If hour doesn't exist, create a new NotAvailableHour
 		if db.IsNotFound(translatedErr) {

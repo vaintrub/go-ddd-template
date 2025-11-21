@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 )
 
@@ -22,8 +21,8 @@ func StartPostgresContainer(ctx context.Context) (string, func(context.Context) 
 		return "", nil, err
 	}
 
-	container, err := postgres.RunContainer(ctx,
-		testcontainers.WithImage("postgres:14"),
+	container, err := postgres.Run(ctx,
+		"postgres:14",
 		postgres.WithDatabase("go_ddd_template_test"),
 		postgres.WithUsername("postgres"),
 		postgres.WithPassword("postgres"),
@@ -61,7 +60,7 @@ func loadInitialSchema() (string, error) {
 	}
 
 	path := filepath.Join(filepath.Dir(file), "..", "..", "..", "migrations", "001_initial_schema.up.sql")
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is constructed from known constants
 	if err != nil {
 		return "", fmt.Errorf("read migration file: %w", err)
 	}
@@ -127,7 +126,8 @@ func ensureDockerAccessible() error {
 		if socket == "" {
 			continue
 		}
-		conn, err := net.DialTimeout("unix", socket, time.Second)
+		dialer := &net.Dialer{Timeout: time.Second}
+		conn, err := dialer.DialContext(context.Background(), "unix", socket)
 		if err == nil {
 			_ = conn.Close()
 			return nil

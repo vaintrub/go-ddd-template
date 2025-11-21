@@ -1,0 +1,35 @@
+# Release Workflow Contract - Automated Semantic Versioning
+# This file serves as the contract/schema for .github/workflows/release.yml
+# It defines the structure and requirements for the release automation workflow
+
+name: Release
+
+on:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Release Please
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      upload_url: ${{ steps.release.outputs.upload_url }}
+    steps:
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: go
+
+      - name: Release created notification
+        if: steps.release.outputs.release_created
+        run: |
+          echo "Release ${{ steps.release.outputs.tag_name }} has been created!"
+          echo "Upload URL: ${{ steps.release.outputs.upload_url }}"
