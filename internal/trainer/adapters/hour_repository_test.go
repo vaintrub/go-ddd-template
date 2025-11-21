@@ -3,6 +3,7 @@ package adapters_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand/v2"
 	"os"
 	"sync"
@@ -13,9 +14,34 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/vaintrub/go-ddd-template/internal/common/config"
 	"github.com/vaintrub/go-ddd-template/internal/common/db"
+	"github.com/vaintrub/go-ddd-template/internal/common/tests"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/adapters"
 	"github.com/vaintrub/go-ddd-template/internal/trainer/domain/hour"
 )
+
+var (
+	postgresURL       string
+	terminatePostgres func(context.Context) error
+)
+
+func TestMain(m *testing.M) {
+	ctx := context.Background()
+	dsn, terminate, err := tests.StartPostgresContainer(ctx)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "skipping trainer adapters tests: %v\n", err)
+		os.Exit(0)
+	}
+	postgresURL = dsn
+	terminatePostgres = terminate
+	os.Setenv("DATABASE_URL", dsn)
+
+	code := m.Run()
+
+	if terminatePostgres != nil {
+		_ = terminatePostgres(context.Background())
+	}
+	os.Exit(code)
+}
 
 func TestRepository(t *testing.T) {
 	t.Parallel()
@@ -261,20 +287,18 @@ var testHourFactory = hour.MustNewFactory(hour.FactoryConfig{
 })
 
 func newPostgresRepository(t *testing.T, ctx context.Context) *adapters.HourPostgresRepository {
-	dbURL := os.Getenv("DATABASE_URL")
-	require.NotEmpty(t, dbURL, "DATABASE_URL must be set for repository tests")
-
 	cfg := config.Config{
 		Env: config.EnvConfig{
 			Name: os.Getenv("ENV"),
 		},
 		Database: config.DatabaseConfig{
-			URL: dbURL,
+			URL: postgresURL,
 		},
 	}
 
 	pool, err := db.NewPgxPool(ctx, cfg.Database, cfg.Env)
 	require.NoError(t, err)
+	t.Cleanup(pool.Close)
 
 	return adapters.NewHourPostgresRepository(pool, testHourFactory)
 }

@@ -1,6 +1,9 @@
 package config
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // Config aggregates every runtime configuration knob that bounded contexts depend on.
 type Config struct {
@@ -21,12 +24,13 @@ type EnvConfig struct {
 
 // ServerConfig controls HTTP/gRPC server settings.
 type ServerConfig struct {
-	Port               int           `mapstructure:"port"`
-	ReadTimeout        time.Duration `mapstructure:"read_timeout"`
-	WriteTimeout       time.Duration `mapstructure:"write_timeout"`
-	IdleTimeout        time.Duration `mapstructure:"idle_timeout"`
-	MockAuth           bool          `mapstructure:"mock_auth"`
-	CORSAllowedOrigins string        `mapstructure:"cors_allowed_origins"`
+	Port                int           `mapstructure:"port"`
+	ReadTimeout         time.Duration `mapstructure:"read_timeout"`
+	WriteTimeout        time.Duration `mapstructure:"write_timeout"`
+	IdleTimeout         time.Duration `mapstructure:"idle_timeout"`
+	MockAuth            bool          `mapstructure:"mock_auth"`
+	CORSAllowedOrigins  string        `mapstructure:"cors_allowed_origins"`
+	PublicAuthSkipPaths string        `mapstructure:"public_auth_skip_paths"`
 }
 
 // LoggingConfig configures structured logging.
@@ -55,7 +59,19 @@ type GRPCConfig struct {
 
 // AuthConfig toggles auth middlewares/helpers.
 type AuthConfig struct {
-	Mock bool `mapstructure:"mock"`
+	Mock    bool          `mapstructure:"mock"`
+	Casdoor CasdoorConfig `mapstructure:"casdoor"`
+}
+
+// CasdoorConfig contains OAuth client values for talking to Casdoor.
+type CasdoorConfig struct {
+	Enabled      bool   `mapstructure:"enabled"`
+	Endpoint     string `mapstructure:"endpoint"`
+	ClientID     string `mapstructure:"client_id"`
+	ClientSecret string `mapstructure:"client_secret"`
+	Certificate  string `mapstructure:"certificate"`
+	Organization string `mapstructure:"organization"`
+	Application  string `mapstructure:"application"`
 }
 
 // ContextOverrides bundles per-context feature flags and observability hints.
@@ -101,6 +117,10 @@ func DefaultConfig() Config {
 		},
 		Auth: AuthConfig{
 			Mock: true,
+			Casdoor: CasdoorConfig{
+				Organization: "local-org",
+				Application:  "local-app",
+			},
 		},
 		Contexts: ContextOverrides{
 			Trainings: ContextConfig{
@@ -114,4 +134,28 @@ func DefaultConfig() Config {
 			},
 		},
 	}
+}
+
+// AuthSkipPaths returns a normalized list of public paths that bypass HTTP auth middleware.
+func (cfg ServerConfig) AuthSkipPaths() []string {
+	return splitCSV(cfg.PublicAuthSkipPaths)
+}
+
+func splitCSV(raw string) []string {
+	if raw == "" {
+		return nil
+	}
+
+	fields := strings.FieldsFunc(raw, func(r rune) bool {
+		return r == ',' || r == ';'
+	})
+
+	results := make([]string, 0, len(fields))
+	for _, field := range fields {
+		if trimmed := strings.TrimSpace(field); trimmed != "" {
+			results = append(results, trimmed)
+		}
+	}
+
+	return results
 }

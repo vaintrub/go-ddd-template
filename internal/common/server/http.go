@@ -70,9 +70,36 @@ func setMiddlewares(router *chi.Mux, logger *slog.Logger, cfg config.ServerConfi
 }
 
 func addAuthMiddleware(router *chi.Mux, cfg config.ServerConfig) {
-	if cfg.MockAuth {
-		router.Use(auth.HttpMockMiddleware)
+	if !cfg.MockAuth {
+		return
 	}
+
+	skipPaths := cfg.AuthSkipPaths()
+	router.Use(func(next http.Handler) http.Handler {
+		protected := auth.HttpMockMiddleware(next)
+
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if shouldSkipAuthentication(r.URL.Path, skipPaths) {
+				next.ServeHTTP(w, r)
+				return
+			}
+			protected.ServeHTTP(w, r)
+		})
+	})
+}
+
+func shouldSkipAuthentication(path string, skipPaths []string) bool {
+	if len(skipPaths) == 0 {
+		return false
+	}
+
+	for _, prefix := range skipPaths {
+		if prefix != "" && strings.HasPrefix(path, prefix) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func addCorsMiddleware(router *chi.Mux, cfg config.ServerConfig) {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"testing"
@@ -84,10 +85,21 @@ func componentTestConfig() config.Config {
 }
 
 func TestMain(m *testing.M) {
+	ctx := context.Background()
+	dbURL, terminate, err := tests.StartPostgresContainer(ctx)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Skipping trainings service tests: %v\n", err)
+		os.Exit(0)
+	}
+	os.Setenv("DATABASE_URL", dbURL)
+
 	dummyT := &testing.T{}
 	if !startService(dummyT) {
+		_ = terminate(context.Background())
 		os.Exit(1)
 	}
 
-	os.Exit(m.Run())
+	code := m.Run()
+	_ = terminate(context.Background())
+	os.Exit(code)
 }

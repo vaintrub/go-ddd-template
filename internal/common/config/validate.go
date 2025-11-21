@@ -80,6 +80,8 @@ func Validate(cfg Config) error {
 		})
 	}
 
+	errs = append(errs, validateCasdoor(cfg)...)
+
 	if level := strings.TrimSpace(cfg.Logging.Level); level != "" {
 		var parsed slog.Level
 		if err := parsed.UnmarshalText([]byte(level)); err != nil {
@@ -94,4 +96,45 @@ func Validate(cfg Config) error {
 		return errs
 	}
 	return nil
+}
+
+func validateCasdoor(cfg Config) []ValidationError {
+	if !cfg.Auth.Casdoor.Enabled {
+		return nil
+	}
+
+	var errs []ValidationError
+
+	if cfg.Auth.Casdoor.Endpoint == "" {
+		errs = append(errs, ValidationError{
+			Field:   "auth.casdoor.endpoint",
+			Message: "is required when CASDOOR is enabled",
+		})
+	}
+	if cfg.Auth.Casdoor.ClientID == "" {
+		errs = append(errs, ValidationError{
+			Field:   "auth.casdoor.client_id",
+			Message: "is required when CASDOOR is enabled",
+		})
+	}
+	if cfg.Auth.Casdoor.ClientSecret == "" {
+		errs = append(errs, ValidationError{
+			Field:   "auth.casdoor.client_secret",
+			Message: "is required when CASDOOR is enabled",
+		})
+	}
+	if cfg.Auth.Casdoor.Organization == "" {
+		errs = append(errs, ValidationError{
+			Field:   "auth.casdoor.organization",
+			Message: "is required when CASDOOR is enabled",
+		})
+	}
+	if cfg.Auth.Casdoor.Application == "" {
+		errs = append(errs, ValidationError{
+			Field:   "auth.casdoor.application",
+			Message: "is required when CASDOOR is enabled",
+		})
+	}
+
+	return errs
 }

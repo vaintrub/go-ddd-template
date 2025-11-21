@@ -1,0 +1,114 @@
+{
+  "organizations": [
+    {
+      "owner": "admin",
+      "name": "built-in",
+      "displayName": "Built-in",
+      "websiteUrl": "https://casdoor.org",
+      "favicon": "",
+      "passwordType": "plain",
+      "defaultApplication": "app-built-in",
+      "languages": ["en"]
+    },
+    {
+      "owner": "admin",
+      "name": "local-org",
+      "displayName": "local-org",
+      "websiteUrl": "https://local.example.com",
+      "passwordType": "plain",
+      "defaultApplication": "local-app",
+      "languages": ["en"]
+    }
+  ],
+  "certs": [
+    {
+      "owner": "built-in",
+      "name": "app-built-in-cert",
+      "displayName": "Default Cert",
+      "scope": "JWT",
+      "type": "x509",
+      "cryptoAlgorithm": "RS256",
+      "bitSize": 4096,
+      "expireInYears": 10,
+      "certificate": "",
+      "privateKey": ""
+    },
+    {
+      "owner": "local-org",
+      "name": "local-app-cert",
+      "displayName": "Local Cert",
+      "scope": "JWT",
+      "type": "x509",
+      "cryptoAlgorithm": "RS256",
+      "bitSize": 4096,
+      "expireInYears": 10,
+      "certificate": "",
+      "privateKey": ""
+    }
+  ],
+  "applications": [
+    {
+      "owner": "admin",
+      "name": "app-built-in",
+      "displayName": "Built-in App",
+      "organization": "built-in",
+      "cert": "app-built-in-cert",
+      "enablePassword": true,
+      "enableSignUp": true,
+      "disableSignin": false,
+      "clientId": "56a984c0ae97fdd9fb10",
+      "clientSecret": "129c5a06756029a0ca0f036c258c4f454150df18",
+      "providers": [
+        {
+          "name": "built-in",
+          "canSignUp": true,
+          "canSignIn": true,
+          "canUnlink": false,
+          "prompted": false,
+          "alertType": "None"
+        }
+      ]
+    },
+    {
+      "owner": "admin",
+      "name": "local-app",
+      "displayName": "Local App",
+      "organization": "local-org",
+      "cert": "local-app-cert",
+      "enablePassword": true,
+      "enableSignUp": true,
+      "disableSignin": false,
+      "clientId": "local-client",
+      "clientSecret": "local-secret",
+      "redirectUris": ["http://localhost:8080/auth/callback"],
+      "grantTypes": ["authorization_code", "refresh_token"],
+      "tokenFormat": "JWT",
+      "tokenSigningMethod": "RS256",
+      "providers": [
+        {
+          "name": "built-in",
+          "canSignUp": true,
+          "canSignIn": true,
+          "canUnlink": false,
+          "prompted": false,
+          "alertType": "None"
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "owner": "built-in",
+      "name": "admin",
+      "displayName": "Admin",
+      "type": "normal-user",
+      "password": "admin123",
+      "email": "admin@local.dev",
+      "phone": "",
+      "address": [],
+      "affiliation": "",
+      "tag": "",
+      "isAdmin": true
+    }
+  ]
+}

@@ -67,3 +67,18 @@ migrate-force:
 .PHONY: sqlc-generate
 sqlc-generate:
 	@sqlc generate
+
+# Casdoor Docker Compose helpers
+CASDOOR_COMPOSE_FILE ?= docker/casdoor/docker-compose.casdoor.yml
+
+.PHONY: casdoor-up
+casdoor-up:
+	@docker compose -f $(CASDOOR_COMPOSE_FILE) --env-file .cusdoor.env up -d
+
+.PHONY: casdoor-down
+casdoor-down:
+	@docker compose -f $(CASDOOR_COMPOSE_FILE) --env-file .cusdoor.env down
+
+.PHONY: casdoor-logs
+casdoor-logs:
+	@docker compose -f $(CASDOOR_COMPOSE_FILE) --env-file .cusdoor.env logs -f
