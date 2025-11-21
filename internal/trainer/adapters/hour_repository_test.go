@@ -33,7 +33,10 @@ func TestMain(m *testing.M) {
 	}
 	postgresURL = dsn
 	terminatePostgres = terminate
-	os.Setenv("DATABASE_URL", dsn)
+	if err := os.Setenv("DATABASE_URL", dsn); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to set DATABASE_URL: %v\n", err)
+		os.Exit(1)
+	}
 
 	code := m.Run()
 

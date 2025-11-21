@@ -91,7 +91,10 @@ func TestMain(m *testing.M) {
 		fmt.Fprintf(os.Stderr, "Skipping trainings service tests: %v\n", err)
 		os.Exit(0)
 	}
-	os.Setenv("DATABASE_URL", dbURL)
+	if err := os.Setenv("DATABASE_URL", dbURL); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to set DATABASE_URL: %v\n", err)
+		os.Exit(1)
+	}
 
 	dummyT := &testing.T{}
 	if !startService(dummyT) {
