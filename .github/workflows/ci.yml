@@ -1,6 +1,5 @@
-# CI Workflow Contract - Pull Request Validation
-# This file serves as the contract/schema for .github/workflows/ci.yml
-# It defines the structure and requirements for the CI validation workflow
+# CI Workflow - Pull Request Validation
+# Optimized for Go projects with best practices (2024-2025)
 
 name: CI
 
@@ -8,6 +7,9 @@ on:
   pull_request:
     branches: [main, master]
     types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
 
 jobs:
   lint:
@@ -22,26 +24,12 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-          cache: false  # Manual caching for more control
+          # cache is enabled by default and caches both modules and build cache
 
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-mod-
-
-      - name: Cache golangci-lint
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/golangci-lint
-          key: ${{ runner.os }}-golangci-lint-${{ hashFiles('internal/**/.golangci.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-golangci-lint-
-
-      - name: Install go-cleanarch
-        run: go install github.com/roblaszczak/go-cleanarch@latest
+      - name: Install tools
+        run: |
+          go install github.com/roblaszczak/go-cleanarch@latest
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
       - name: Run lint
         run: make lint
@@ -58,22 +46,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
-
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-stable-mod-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-stable-mod-
-
-      - name: Cache Go build
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/go-build
-          key: ${{ runner.os }}-go-stable-build-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-go-stable-build-
+          # cache is enabled by default
 
       - name: Run tests
         run: make test
@@ -82,7 +55,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage.out
+          path: |
+            coverage.out
+            **/coverage.out
           if-no-files-found: ignore
 
   commitlint:
@@ -98,12 +73,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
+
+      - name: Cache commitlint modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-commitlint-${{ hashFiles('.commitlintrc.json') }}
+          restore-keys: |
+            ${{ runner.os }}-commitlint-
 
       - name: Install commitlint
-        run: |
-          npm install --save-dev @commitlint/cli @commitlint/config-conventional
+        run: npm install --save-dev @commitlint/cli @commitlint/config-conventional
 
       - name: Validate commit messages
-        run: |
-          npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
