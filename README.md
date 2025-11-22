@@ -933,13 +933,5 @@ See [LICENSE](LICENSE) file.
 
 ## Documentation
 
-- [Feature Specifications](specs/)
 - [Database Schema](migrations/)
 - [API Contracts](api/)
-
-## Support
-
-For issues and questions:
-- Create an issue in the repository
-- Check existing documentation in `specs/`
-- Review this README
